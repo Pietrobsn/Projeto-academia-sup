@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Superação • Central de Cancelamentos</title>
+  <style>
+    :root{
+      --bg:#f3f8f4;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:#d9e5dd;
+      --green:#18b33e;
+      --green-dark:#0e6a2b;
+      --green-soft:#e9f8ee;
+      --black:#09110b;
+      --amber:#a16207;
+      --amber-bg:#fff4db;
+      --blue:#1d4ed8;
+      --blue-bg:#eaf1ff;
+      --red:#b91c1c;
+      --red-bg:#feeaea;
+      --violet:#6d28d9;
+      --violet-bg:#f1eaff;
+      --shadow:0 12px 30px rgba(15,23,42,.08);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:linear-gradient(135deg,#edf7f0 0%,#fff 45%,#eef3f8 100%);color:var(--text)}
+    button,input,select,textarea{font:inherit}
+    .app{max-width:1380px;margin:0 auto;padding:18px}
+    .hero{background:linear-gradient(135deg,#07110a 0%,#102016 100%);color:#fff;border-radius:28px;padding:26px;display:grid;grid-template-columns:1.4fr .7fr;gap:18px;box-shadow:0 24px 40px rgba(0,0,0,.15)}
+    .chip{display:inline-flex;gap:8px;align-items:center;padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.09);font-size:12px;font-weight:800;color:#bbf7d0}
+    .dot{width:10px;height:10px;border-radius:999px;background:var(--green)}
+    h1{margin:14px 0 10px;font-size:40px;line-height:1.05}
+    .hero p{margin:0;max-width:720px;color:#d1d5db;line-height:1.55}
+    .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}
+    .btn{border:none;border-radius:18px;padding:12px 16px;font-weight:800;cursor:pointer;transition:.15s ease;display:inline-flex;align-items:center;gap:8px}
+    .btn:hover{transform:translateY(-1px)}
+    .btn-primary{background:var(--green);color:#fff}
+    .btn-primary:hover{background:#129737}
+    .btn-dark{background:rgba(255,255,255,.1);color:#fff}
+    .btn-dark:hover{background:rgba(255,255,255,.16)}
+    .btn-light{background:#fff;border:1px solid var(--line);color:var(--text)}
+    .btn-danger{background:#fff;border:1px solid #fecaca;color:var(--red)}
+    .btn[disabled]{opacity:.55;cursor:not-allowed;transform:none}
+    .side-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:18px}
+    .side-card h3{margin:0 0 8px;color:#bbf7d0;font-size:14px}
+    .big{font-size:30px;font-weight:900}
+    .small-card{margin-top:12px;padding:14px;border-radius:18px;background:rgba(255,255,255,.08);font-size:14px;color:#e5e7eb}
+    .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:18px}
+    .card{background:var(--card);border-radius:24px;box-shadow:var(--shadow);border:1px solid rgba(15,23,42,.03)}
+    .stat{padding:18px}
+    .stat-top{display:flex;justify-content:space-between;gap:10px}
+    .pill{width:42px;height:42px;border-radius:15px;background:var(--green-soft);display:flex;align-items:center;justify-content:center;color:var(--green-dark);font-size:18px}
+    .label{font-size:13px;color:var(--muted)}
+    .value{font-size:30px;font-weight:900;margin-top:8px}
+    .sub{font-size:12px;color:var(--muted);margin-top:8px}
+    .tabs{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0 14px}
+    .tab{border:none;background:#fff;padding:12px 16px;border-radius:16px;font-weight:800;cursor:pointer;box-shadow:var(--shadow);color:#314155}
+    .tab.active{background:linear-gradient(135deg,var(--green-dark),var(--green));color:#fff}
+    .panel{display:none}
+    .panel.active{display:block}
+    .filters,.wrap{padding:18px}
+    .filters-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr auto;gap:12px}
+    .field label{display:block;font-size:13px;font-weight:700;color:#475569;margin-bottom:8px}
+    .input,.select,.textarea{width:100%;padding:12px 14px;border-radius:16px;border:1px solid var(--line);background:#fff;outline:none}
+    .input:focus,.select:focus,.textarea:focus{border-color:#4ade80;box-shadow:0 0 0 3px rgba(24,179,62,.12)}
+    .input[readonly]{background:#f8fafc;color:#475569}
+    .input[disabled],.select[disabled]{background:#f8fafc;color:#64748b;cursor:not-allowed}
+    .list{display:grid;gap:14px}
+    .record{padding:18px}
+    .record-grid{display:grid;grid-template-columns:repeat(5,1fr) auto;gap:16px;align-items:start}
+    .record-grid.unit{grid-template-columns:repeat(5,1fr) auto}
+    .record-label{font-size:11px;text-transform:uppercase;color:#94a3b8;font-weight:800;letter-spacing:.06em}
+    .record-title{font-size:17px;font-weight:900;margin-top:8px}
+    .record-value{margin-top:8px;font-weight:700}
+    .record-muted{font-size:13px;color:var(--muted);margin-top:6px}
+    .record-money{font-size:22px;font-weight:900;color:var(--green-dark);margin-top:8px}
+    .record-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .status{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;font-size:12px;font-weight:900;border:1px solid transparent}
+    .recebido{background:#f1f5f9;color:#334155;border-color:#cbd5e1}
+    .pendencia{background:var(--red-bg);color:var(--red);border-color:#fecaca}
+    .analise{background:var(--blue-bg);color:var(--blue);border-color:#cadeff}
+    .aprovado{background:var(--violet-bg);color:var(--violet);border-color:#ded0ff}
+    .reembolsado,.concluido{background:var(--green-soft);color:var(--green-dark);border-color:#cbeed5}
+    .cancelado{background:var(--red-bg);color:var(--red);border-color:#fecaca}
+    .observ{margin-top:14px;background:#f8fafc;border-radius:18px;padding:14px;font-size:14px;color:#475569}
+    .small-select{padding:9px 12px;border-radius:14px;border:1px solid var(--line);background:#fff;font-size:12px}
+    .dash{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .dash-card{padding:18px}
+    .dash-top{display:flex;justify-content:space-between;gap:10px;align-items:center}
+    .badge{padding:8px 12px;border-radius:999px;background:var(--green-soft);color:var(--green-dark);font-size:12px;font-weight:900}
+    .metric{padding:16px;background:#f8fafc;border-radius:18px;margin-top:14px}
+    .metric .big{font-size:28px}
+    .mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+    .mini{padding:14px;border-radius:18px;background:#f8fafc}
+    .bar{height:12px;background:#edf2f7;border-radius:999px;overflow:hidden;margin-top:10px}
+    .bar > span{display:block;height:100%;background:linear-gradient(90deg,var(--green-dark),var(--green));border-radius:999px}
+    .form-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+    .span-2{grid-column:span 2}
+    .span-3{grid-column:span 3}
+    .span-4{grid-column:span 4}
+    .section-title{grid-column:span 4;margin:8px 0 0;padding:14px 16px;border-radius:18px;background:#f8fafc;border:1px solid #e5e7eb;color:#0f172a;font-weight:900}
+    .toolbar{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap;margin-bottom:18px}
+    .muted{color:var(--muted)}
+    .notice{margin-top:12px;padding:12px 14px;border-radius:16px;font-size:13px;font-weight:700;display:none}
+    .notice.show{display:block}
+    .notice.ok{background:#e8f7ee;color:var(--green-dark)}
+    .notice.warn{background:#fff4db;color:#92400e}
+    .notice.err{background:#feeaea;color:var(--red)}
+    .empty{padding:46px;text-align:center;color:var(--muted);font-weight:700}
+    .modal{position:fixed;inset:0;background:rgba(2,8,23,.55);display:none;align-items:center;justify-content:center;padding:18px;z-index:999}
+    .modal.show{display:flex}
+    .modal-card{width:min(1180px,100%);max-height:94vh;overflow:auto;background:#fff;border-radius:28px;box-shadow:0 30px 80px rgba(0,0,0,.18)}
+    .modal-head{position:sticky;top:0;background:rgba(255,255,255,.97);backdrop-filter:blur(8px);padding:18px 20px;border-bottom:1px solid #eef2f7;display:flex;justify-content:space-between;gap:10px;align-items:center;z-index:2}
+    .sync{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:900}
+    .sync.on{background:#e8f7ee;color:var(--green-dark)}
+    .sync.off{background:#feeaea;color:#991b1b}
+    .login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#07110a 0%,#102016 55%,#0e6a2b 100%)}
+    .login-card{width:min(980px,100%);display:grid;grid-template-columns:1.05fr .95fr;background:#fff;border-radius:32px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.28)}
+    .login-brand{background:linear-gradient(135deg,#07110a,#0e6a2b);color:#fff;padding:36px;display:flex;flex-direction:column;justify-content:space-between;min-height:520px}
+    .login-brand h2{font-size:38px;line-height:1.05;margin:18px 0 12px}
+    .login-brand p{color:#d1fae5;line-height:1.55;margin:0;max-width:460px}
+    .login-form{padding:36px;display:flex;flex-direction:column;justify-content:center;gap:16px}
+    .login-form h3{font-size:26px;margin:0 0 4px;color:#0f172a}
+    .login-help{background:#f0fdf4;border:1px solid #bbf7d0;color:#14532d;border-radius:18px;padding:14px;font-size:13px;line-height:1.5}
+    .login-error{display:none;background:#feeaea;color:#991b1b;border:1px solid #fecaca;border-radius:16px;padding:12px;font-weight:800;font-size:13px}
+    .login-error.show{display:block}
+    .user-pill{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:11px 14px;background:rgba(255,255,255,.1);color:#bbf7d0;font-weight:900;font-size:13px;border:1px solid rgba(255,255,255,.12)}
+    .footer{margin-top:12px;font-size:12px;color:#64748b;text-align:right}
+    .hidden{display:none!important}
+    @media (max-width:1180px){.hero{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.record-grid,.record-grid.unit,.form-grid,.dash{grid-template-columns:repeat(2,1fr)}.span-4,.section-title{grid-column:span 2}}
+    @media (max-width:840px){.login-card{grid-template-columns:1fr}.login-brand{min-height:auto}.login-brand h2{font-size:30px}}
+    @media (max-width:760px){.app{padding:14px}.stats,.filters-grid,.record-grid,.record-grid.unit,.form-grid,.dash,.mini-grid{grid-template-columns:1fr}.span-2,.span-3,.span-4,.section-title{grid-column:span 1}h1{font-size:32px}.record-actions{justify-content:flex-start}}
+  </style>
+</head>
+<body>
+  <div class="login-screen" id="loginScreen">
+    <div class="login-card">
+      <div class="login-brand">
+        <div>
+          <div class="chip"><span class="dot"></span> Academia Superação • Acesso interno</div>
+          <h2>Central de Cancelamentos</h2>
+          <p>As unidades apenas enviam os pedidos. Depois de enviado, somente o ADM pode revisar, editar, calcular multa e finalizar.</p>
+        </div>
+        <div class="small-card" style="background:rgba(255,255,255,.1)">
+          Sistema com acesso por unidade, Excel, relatório em paisagem e revisão administrativa.
+        </div>
+      </div>
+      <form class="login-form" id="loginForm">
+        <div>
+          <h3>Entrar no sistema</h3>
+          <div class="muted">Use o acesso interno autorizado.</div>
+        </div>
+        <div class="login-error" id="loginError">Login ou senha inválidos.</div>
+        <div class="field">
+          <label>Login</label>
+          <input class="input" name="login" autocomplete="username" placeholder="Digite o login" />
+        </div>
+        <div class="field">
+          <label>Senha</label>
+          <input class="input" name="senha" type="password" autocomplete="current-password" placeholder="Digite a senha" />
+        </div>
+        <button class="btn btn-primary" type="submit" style="justify-content:center">Entrar</button>
+        <div class="login-help">
+          O ADM pode criar e alterar os logins dentro do próprio sistema. As senhas não ficam salvas no HTML.
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="app" id="app" style="display:none">
+    <section class="hero">
+      <div>
+        <div class="chip"><span class="dot"></span> Academia Superação • Central de Cancelamentos</div>
+        <h1>Sistema de cancelamento e reembolso.</h1>
+        <p id="heroSub">Revisão administrativa</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary" id="btnNovo" type="button">+ Novo cancelamento</button>
+          <button class="btn btn-dark only-admin" id="btnExportar" type="button">Exportar Excel</button>
+          <button class="btn btn-dark only-admin" id="btnImprimir" type="button">Imprimir relatório</button>
+          <span class="user-pill" id="currentUserBadge">Usuário</span>
+          <button class="btn btn-dark" id="btnSair" type="button">Sair</button>
+        </div>
+      </div>
+      <div class="side-card">
+        <h3>Visão rápida</h3>
+        <div class="big" id="visaoValor">0</div>
+        <div class="small-card" id="syncWrap"></div>
+        <div class="small-card" id="pendingWrap">Nenhum processo pendente.</div>
+        <div class="small-card" id="noticeWrap">Painel com filtros inteligentes, Excel e relatório pronto para impressão.</div>
+      </div>
+    </section>
+
+    <section class="stats" id="stats"></section>
+
+    <div id="notice" class="notice" aria-live="polite"></div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="lista" type="button">Lista</button>
+      <button class="tab only-admin" data-tab="dashboard" type="button">Dashboard</button>
+      <button class="tab" data-tab="cadastro" type="button">Cadastro</button>
+      <button class="tab only-admin" data-tab="usuarios" type="button">Usuários</button>
+    </div>
+
+    <section class="panel active" id="panel-lista">
+      <div class="card filters">
+        <div class="filters-grid">
+          <div class="field">
+            <label>Buscar por aluno, matrícula, consultor, motivo, status ou unidade</label>
+            <input id="searchInput" class="input" placeholder="Ex.: Stephany, 111554, Kelly, lesão..." />
+          </div>
+          <div class="field">
+            <label>Unidade</label>
+            <select id="filterUnidade" class="select">
+              <option value="Todas">Todas as unidades</option>
+              <option value="UR-03">UR-03</option>
+              <option value="UR-02">UR-02</option>
+              <option value="Jaboatão">Jaboatão</option>
+              <option value="Ibura de Baixo">Ibura de Baixo</option>
+            </select>
+          </div>
+          <div class="field only-admin">
+            <label>Status</label>
+            <select id="filterStatus" class="select">
+              <option value="Todos">Todos</option>
+              <option value="Recebido da unidade">Recebido da unidade</option>
+              <option value="Em análise">Em análise</option>
+              <option value="Pendência">Pendência</option>
+              <option value="Aprovado">Aprovado</option>
+              <option value="Reembolsado">Reembolsado</option>
+              <option value="Concluído">Concluído</option>
+              <option value="Cancelado">Cancelado</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Ordenar por</label>
+            <select id="filterSort" class="select">
+              <option value="data_desc">Mais recentes primeiro</option>
+              <option value="data_asc">Mais antigos primeiro</option>
+              <option value="aluno_asc">Aluno A → Z</option>
+              <option value="aluno_desc">Aluno Z → A</option>
+              <option class="only-admin" value="meses_asc">Menos meses primeiro</option>
+              <option class="only-admin" value="reembolso_desc">Maior reembolso</option>
+            </select>
+          </div>
+          <div class="field" style="align-self:end">
+            <button class="btn btn-primary" id="btnAtualizar" style="width:100%" type="button">Atualizar</button>
+          </div>
+        </div>
+      </div>
+      <div class="list" id="recordList"></div>
+    </section>
+
+    <section class="panel" id="panel-dashboard">
+      <div class="dash" id="dashCards"></div>
+    </section>
+
+    <section class="panel" id="panel-cadastro">
+      <div class="card wrap">
+        <div class="toolbar">
+          <div>
+            <h3 style="margin:0">Cadastro de cancelamento</h3>
+            <div class="muted" id="cadastroHint" style="margin-top:6px">As unidades apenas enviam os dados. Depois do envio, a revisão fica com o ADM.</div>
+          </div>
+          <button class="btn btn-primary" id="btnNovoCadastro" type="button">+ Novo cadastro</button>
+        </div>
+        <form id="formCadastro" class="form-grid"></form>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-usuarios">
+      <div class="card wrap">
+        <div class="toolbar">
+          <div>
+            <h3 style="margin:0">Usuários do sistema</h3>
+            <div class="muted" style="margin-top:6px">Somente ADM pode criar, alterar ou desativar logins.</div>
+          </div>
+          <button class="btn btn-primary" id="btnNovoUsuario" type="button">+ Novo usuário</button>
+        </div>
+
+        <form id="formUsuario" class="form-grid">
+          <input type="hidden" name="id" />
+          <div class="field"><label>Login</label><input name="login" class="input" placeholder="Ex.: UR3" /></div>
+          <div class="field"><label>Senha</label><input name="senha" type="password" class="input" placeholder="Nova senha" /></div>
+          <div class="field"><label>Nome de exibição</label><input name="nome" class="input" placeholder="Ex.: Unidade UR-03" /></div>
+          <div class="field"><label>Perfil</label><select name="perfil" class="select"><option value="unidade">Unidade</option><option value="admin">ADM</option></select></div>
+          <div class="field"><label>Unidade</label><select name="unidade" class="select"><option>UR-03</option><option>UR-02</option><option>Jaboatão</option><option>Ibura de Baixo</option><option>Todas</option></select></div>
+          <div class="field"><label>Status</label><select name="ativo" class="select"><option value="true">Ativo</option><option value="false">Inativo</option></select></div>
+          <div class="span-4" style="display:flex;gap:12px;flex-wrap:wrap">
+            <button class="btn btn-primary" type="submit">Salvar usuário</button>
+            <button class="btn btn-light" type="button" id="btnLimparUsuario">Limpar</button>
+          </div>
+        </form>
+
+        <div class="list" id="userList" style="margin-top:18px"></div>
+      </div>
+    </section>
+
+    <div class="footer"></div>
+  </div>
+
+  <div class="modal" id="modalForm">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h3 style="margin:0" id="modalTitle">Novo cancelamento</h3>
+          <div class="muted" id="modalHint" style="margin-top:6px">Preencha os dados e salve.</div>
+        </div>
+        <button class="btn btn-light" id="btnFecharModal" type="button">Fechar</button>
+      </div>
+      <div style="padding:20px">
+        <form id="modalCadastro" class="form-grid"></form>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+    const CONFIG = {
+      supabaseUrl: '',
+      supabaseAnonKey: ''
+    };
+
+    const STATUS_LIST = ['Recebido da unidade','Em análise','Pendência','Aprovado','Reembolsado','Concluído','Cancelado'];
+    const UNIT_LIST = ['UR-03','UR-02','Jaboatão','Ibura de Baixo'];
+    const PLANOS = ['Semestral','Anual'];
+    const SESSION_KEY = 'superacao_cancelamentos_token_v13';
+    const ADMIN_ONLY_SORTS = new Set(['meses_asc', 'reembolso_desc']);
+
+    let supabaseClient = null;
+    let records = [];
+    let users = [];
+    let editingId = null;
+    let currentUser = null;
+    let sessionToken = null;
+    let isSavingRecord = false;
+    let lastLoadedAt = null;
+
+    const $ = (selector) => document.querySelector(selector);
+    const $$ = (selector) => Array.from(document.querySelectorAll(selector));
+
+    function clean(value) { return String(value ?? '').trim(); }
+    function todayLocalISO() {
+      const now = new Date();
+      const offset = now.getTimezoneOffset() * 60000;
+      return new Date(now.getTime() - offset).toISOString().slice(0, 10);
+    }
+    function money(value) { return new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' }).format(Number(value || 0)); }
+    function dateBR(value) { if (!value) return '-'; const [y,m,d] = String(value).split('-'); return (y&&m&&d) ? `${d}/${m}/${y}` : value; }
+    function escapeHtml(text) { return String(text || '').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;').replaceAll("'",'&#039;'); }
+    function normalizeSearchText(value) {
+      return clean(value)
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase();
+    }
+    function statusClass(status) { return ({'Recebido da unidade':'recebido','Em análise':'analise','Pendência':'pendencia','Aprovado':'aprovado','Reembolsado':'reembolsado','Concluído':'concluido','Cancelado':'cancelado'})[status] || 'recebido'; }
+    function isAdmin() { return currentUser?.perfil === 'admin'; }
+    function userUnit() { return currentUser?.unidade || 'Todas'; }
+    function userCanSeeUnit(unidade) { return isAdmin() || userUnit() === unidade; }
+
+    function multaMeses(plano) {
+      return plano === 'Anual' ? 2 : 1;
+    }
+
+    function calcValues({ plano_cancelamento, meses_faltantes, valor_mensalidade }) {
+      const meses = Number(meses_faltantes || 0);
+      const mensalidade = Number(valor_mensalidade || 0);
+      const multa = multaMeses(plano_cancelamento || 'Semestral');
+      const receber = Math.max(meses - multa, 0);
+      return {
+        multa_meses: multa,
+        meses_receber: receber,
+        valor_bruto: meses * mensalidade,
+        valor_multa: multa * mensalidade,
+        valor_reembolso: receber * mensalidade
+      };
+    }
+
+    function showNotice(text, type='ok') {
+      const el = $('#notice');
+      el.textContent = text;
+      el.className = 'notice show ' + type;
+      clearTimeout(showNotice._timer);
+      showNotice._timer = setTimeout(() => { el.className = 'notice'; el.textContent = ''; }, 4200);
+    }
+
+    function renderSync(connected) {
+      $('#syncWrap').innerHTML = connected
+        ? '<span class="sync on">● Banco conectado</span>'
+        : '<span class="sync off">● Banco não carregado</span>';
+    }
+
+    function isConfigured() {
+      return !!(clean(CONFIG.supabaseUrl) && clean(CONFIG.supabaseAnonKey));
+    }
+
+    function currentFilters() {
+      const unidadeFiltro = $('#filterUnidade')?.value || 'Todas';
+      return {
+        search: normalizeSearchText($('#searchInput')?.value),
+        unidade: isAdmin() ? unidadeFiltro : userUnit(),
+        status: isAdmin() ? ($('#filterStatus')?.value || 'Todos') : 'Todos',
+        sort: $('#filterSort')?.value || 'data_desc'
+      };
+    }
+
+    function compareText(a, b) { return String(a || '').localeCompare(String(b || ''), 'pt-BR', { sensitivity:'base' }); }
+    function compareNumber(a, b) { return Number(a || 0) - Number(b || 0); }
+    function compareDate(a, b) { return String(a || '').localeCompare(String(b || '')); }
+
+    function filteredRecords() {
+      if (!currentUser) return [];
+      const { search, unidade, status, sort } = currentFilters();
+      const data = records.filter(item => {
+        const hay = normalizeSearchText([
+          item.aluno,
+          item.matricula,
+          item.consultor,
+          item.motivo,
+          item.status,
+          item.unidade,
+          item.dados_bancarios
+        ].filter(Boolean).join(' '));
+        const okUserUnit = userCanSeeUnit(item.unidade);
+        const okSearch = !search || hay.includes(search);
+        const okUnit = unidade === 'Todas' || item.unidade === unidade;
+        const okStatus = status === 'Todos' || item.status === status;
+        return okUserUnit && okSearch && okUnit && okStatus;
+      });
+
+      return [...data].sort((a, b) => {
+        if (sort === 'aluno_asc') return compareText(a.aluno, b.aluno);
+        if (sort === 'aluno_desc') return compareText(b.aluno, a.aluno);
+        if (sort === 'meses_asc') return compareNumber(a.meses_faltantes, b.meses_faltantes) || compareText(a.aluno, b.aluno);
+        if (sort === 'reembolso_desc') return compareNumber(b.valor_reembolso, a.valor_reembolso) || compareText(a.aluno, b.aluno);
+        if (sort === 'data_asc') return compareDate(a.data_solicitacao, b.data_solicitacao) || compareText(a.aluno, b.aluno);
+        return compareDate(b.data_solicitacao, a.data_solicitacao) || compareText(a.aluno, b.aluno);
+      });
+    }
+
+    function getStats(data) {
+      return {
+        totalReembolso: data.reduce((acc, item) => acc + Number(item.valor_reembolso || 0), 0),
+        recebidos: data.filter(item => item.status === 'Recebido da unidade').length,
+        analise: data.filter(item => item.status === 'Em análise').length,
+        concluidos: data.filter(item => ['Concluído','Reembolsado'].includes(item.status)).length,
+        consultores: new Set(data.map(item => item.consultor).filter(Boolean)).size
+      };
+    }
+
+    function monthlyProjection() {
+      const currentMonth = todayLocalISO().slice(0,7);
+      return records
+        .filter(item => userCanSeeUnit(item.unidade))
+        .filter(item => String(item.data_solicitacao || '').startsWith(currentMonth));
+    }
+
+    function renderStats() {
+      const data = filteredRecords();
+      const s = getStats(data);
+      const mes = monthlyProjection();
+
+      let cards;
+      if (isAdmin()) {
+        cards = [
+          { label:'Total em reembolso', value:money(s.totalReembolso), sub:'Com base no filtro atual', icon:'💸' },
+          { label:'Cancelamentos', value:data.length, sub:'Registros encontrados', icon:'📋' },
+          { label:'Recebidos', value:s.recebidos, sub:'Enviados pelas unidades', icon:'📥' },
+          { label:'Em análise', value:s.analise, sub:'Em validação', icon:'🔎' },
+          { label:'Consultores', value:s.consultores, sub:'Ativos no filtro', icon:'👥' }
+        ];
+        $('#visaoValor').textContent = money(mes.reduce((acc, item) => acc + Number(item.valor_reembolso || 0), 0));
+        $('#pendingWrap').textContent = s.recebidos > 0 ? `${s.recebidos} solicitação(ões) recebida(s) precisam de revisão.` : 'Nenhuma solicitação pendente de revisão.';
+        $('#noticeWrap').textContent = 'ADM revisa meses, multa, valor mensalidade, reembolso, status e usuários.';
+      } else {
+        cards = [
+          { label:'Solicitações', value:data.length, sub:'Da sua unidade', icon:'📋' },
+          { label:'Unidade', value:userUnit(), sub:'Acesso limitado à unidade', icon:'🏢' },
+          { label:'Enviadas no mês', value:mes.length, sub:'Solicitações deste mês', icon:'📅' },
+          { label:'Consultores', value:s.consultores, sub:'Nos registros enviados', icon:'👥' },
+          { label:'Plano usado', value:'Semestral/Anual', sub:'Seleção no cadastro', icon:'📝' }
+        ];
+        $('#visaoValor').textContent = String(data.length);
+        $('#pendingWrap').textContent = 'Você pode apenas enviar novos cancelamentos. Depois de enviado, somente o ADM pode alterar.';
+        $('#noticeWrap').textContent = 'Se enviar errado, solicite correção ao ADM. O login da unidade não edita registros já enviados.';
+      }
+
+      $('#stats').innerHTML = cards.map(card => `
+        <div class="card stat">
+          <div class="stat-top">
+            <div>
+              <div class="label">${card.label}</div>
+              <div class="value">${card.value}</div>
+              <div class="sub">${card.sub}</div>
+            </div>
+            <div class="pill">${card.icon}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderList() {
+      const data = filteredRecords();
+      const el = $('#recordList');
+      if (!currentUser) { el.innerHTML = ''; return; }
+      if (!data.length) {
+        el.innerHTML = '<div class="card empty">Nenhum cancelamento encontrado com os filtros atuais.</div>';
+        return;
+      }
+
+      if (!isAdmin()) {
+        el.innerHTML = data.map(item => `
+          <div class="card record">
+            <div class="record-grid unit">
+              <div>
+                <div class="record-label">Data / Aluno</div>
+                <div class="record-title">${dateBR(item.data_solicitacao)}</div>
+                <div class="record-muted">${escapeHtml(item.aluno || '-')}</div>
+              </div>
+              <div>
+                <div class="record-label">Matrícula / Unidade</div>
+                <div class="record-value">${escapeHtml(item.matricula || '-')}</div>
+                <div class="record-muted">${escapeHtml(item.unidade || '-')}</div>
+              </div>
+              <div>
+                <div class="record-label">Plano</div>
+                <div class="record-value">${dateBR(item.inicio_plano)} → ${dateBR(item.fim_plano)}</div>
+                <div class="record-muted">${escapeHtml(item.plano_cancelamento || 'Semestral')}</div>
+              </div>
+              <div>
+                <div class="record-label">Dados bancários</div>
+                <div class="record-value">${escapeHtml(item.dados_bancarios || '-')}</div>
+                <div class="record-muted">Campo enviado pela unidade</div>
+              </div>
+              <div>
+                <div class="record-label">Consultor / Motivo</div>
+                <div class="record-value">${escapeHtml(item.consultor || '-')}</div>
+                <div class="record-muted">${escapeHtml(item.motivo || '-')}</div>
+              </div>
+              <div class="record-actions">
+                <span class="status ${statusClass(item.status)}">${escapeHtml(item.status || 'Recebido da unidade')}</span>
+              </div>
+            </div>
+          </div>
+        `).join('');
+        return;
+      }
+
+      el.innerHTML = data.map(item => {
+        return `
+          <div class="card record">
+            <div class="record-grid">
+              <div>
+                <div class="record-label">Aluno</div>
+                <div class="record-title">${escapeHtml(item.aluno || '-')}</div>
+                <div class="record-muted">Matrícula ${escapeHtml(item.matricula || '-')}</div>
+              </div>
+              <div>
+                <div class="record-label">Unidade / Consultor</div>
+                <div class="record-value">${escapeHtml(item.unidade || '-')}</div>
+                <div class="record-muted">${escapeHtml(item.consultor || '-')}</div>
+              </div>
+              <div>
+                <div class="record-label">Plano de cancelamento</div>
+                <div class="record-value">${escapeHtml(item.plano_cancelamento || 'Semestral')}</div>
+                <div class="record-muted">${Number(item.meses_faltantes || 0)} faltam • multa ${Number(item.multa_meses || 0)} mês(es)</div>
+              </div>
+              <div>
+                <div class="record-label">Financeiro</div>
+                <div class="record-money">${money(item.valor_reembolso)}</div>
+                <div class="record-muted">Recebe ${Number(item.meses_receber || 0)} mês(es) • mensal ${money(item.valor_mensalidade)}</div>
+              </div>
+              <div>
+                <div class="record-label">Status / Motivo</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px">
+                  <span class="status ${statusClass(item.status)}">${escapeHtml(item.status || 'Recebido da unidade')}</span>
+                  <select class="small-select status-select" data-action="status" data-id="${item.id}">
+                    ${STATUS_LIST.map(status => `<option value="${status}" ${status === item.status ? 'selected' : ''}>${status}</option>`).join('')}
+                  </select>
+                </div>
+                <div class="record-muted">${escapeHtml(item.motivo || '-')}</div>
+              </div>
+              <div class="record-actions">
+                <button class="btn btn-light" type="button" data-action="edit" data-id="${item.id}">Revisar</button>
+                <button class="btn btn-danger" type="button" data-action="delete" data-id="${item.id}">Excluir</button>
+              </div>
+            </div>
+            <div class="observ">
+              <strong>Dados bancários:</strong> ${escapeHtml(item.dados_bancarios || '-')}
+              ${item.observacoes_adm ? `<br><strong>Obs. ADM:</strong> ${escapeHtml(item.observacoes_adm)}` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderDashboard() {
+      if (!isAdmin()) {
+        $('#dashCards').innerHTML = '';
+        return;
+      }
+      const data = filteredRecords();
+      const total = Math.max(data.length, 1);
+      $('#dashCards').innerHTML = UNIT_LIST.map(unit => {
+        const items = data.filter(item => item.unidade === unit);
+        const value = items.reduce((acc, item) => acc + Number(item.valor_reembolso || 0), 0);
+        const avg = items.length ? value / items.length : 0;
+        const percent = Math.round((items.length / total) * 100);
+        return `
+          <div class="card dash-card">
+            <div class="dash-top">
+              <h3 style="margin:0">${unit}</h3>
+              <span class="badge">${items.length} registro(s)</span>
+            </div>
+            <div class="metric">
+              <div class="label">Total de reembolso</div>
+              <div class="big">${money(value)}</div>
+            </div>
+            <div class="mini-grid">
+              <div class="mini"><div class="label">Ticket médio</div><div class="record-value">${money(avg)}</div></div>
+              <div class="mini"><div class="label">Participação</div><div class="record-value">${percent}%</div></div>
+            </div>
+            <div class="bar"><span style="width:${percent}%"></span></div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderUsers() {
+      const el = $('#userList');
+      if (!el || !isAdmin()) return;
+      if (!users.length) {
+        el.innerHTML = '<div class="card empty">Nenhum usuário encontrado.</div>';
+        return;
+      }
+      el.innerHTML = users.map(user => `
+        <div class="card record">
+          <div class="record-grid">
+            <div>
+              <div class="record-label">Login</div>
+              <div class="record-title">${escapeHtml(user.login)}</div>
+              <div class="record-muted">${escapeHtml(user.nome || '-')}</div>
+            </div>
+            <div>
+              <div class="record-label">Perfil</div>
+              <div class="record-value">${user.perfil === 'admin' ? 'ADM' : 'Unidade'}</div>
+              <div class="record-muted">${escapeHtml(user.unidade || '-')}</div>
+            </div>
+            <div>
+              <div class="record-label">Status</div>
+              <div class="record-value">${user.ativo ? 'Ativo' : 'Inativo'}</div>
+              <div class="record-muted">Criado em ${dateBR(String(user.created_at || '').slice(0,10))}</div>
+            </div>
+            <div class="record-actions">
+              <button class="btn btn-light" type="button" data-user-action="edit" data-id="${user.id}">Editar</button>
+              <button class="btn btn-danger" type="button" data-user-action="delete" data-id="${user.id}">Excluir</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function updateUserUI() {
+      if (!currentUser) return;
+      $('#currentUserBadge').textContent = isAdmin() ? 'ADM • acesso geral' : `${currentUser.nome} • ${currentUser.unidade}`;
+      $('#heroSub').textContent = isAdmin()
+        ? 'Revisão administrativa'
+        : 'Envio da unidade';
+
+      $$('.only-admin').forEach(el => el.classList.toggle('hidden', !isAdmin()));
+
+      const unidadeFiltro = $('#filterUnidade');
+      if (unidadeFiltro) {
+        unidadeFiltro.disabled = !isAdmin();
+        unidadeFiltro.value = isAdmin() ? (unidadeFiltro.value || 'Todas') : currentUser.unidade;
+      }
+
+      const sortFiltro = $('#filterSort');
+      if (!isAdmin() && sortFiltro && ADMIN_ONLY_SORTS.has(sortFiltro.value)) {
+        sortFiltro.value = 'data_desc';
+      }
+
+      if (!isAdmin() && ($('#panel-dashboard').classList.contains('active') || $('#panel-usuarios').classList.contains('active'))) {
+        setActiveTab('lista');
+      }
+    }
+
+    function renderAll(connected=true) {
+      updateUserUI();
+      renderSync(connected);
+      renderStats();
+      renderList();
+      renderDashboard();
+      if (isAdmin()) renderUsers();
+      renderFooter();
+    }
+
+    function renderFooter() {
+      const el = $('.footer');
+      if (!el) return;
+      if (!currentUser) {
+        el.textContent = '';
+        return;
+      }
+      const visible = filteredRecords().length;
+      const scopedTotal = records.filter(item => userCanSeeUnit(item.unidade)).length;
+      const updated = lastLoadedAt
+        ? ` • atualizado às ${lastLoadedAt.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' })}`
+        : '';
+      el.textContent = `${visible} de ${scopedTotal} registro(s) exibido(s)${updated}`;
+    }
+
+    function showApp() {
+      $('#loginScreen').style.display = 'none';
+      $('#app').style.display = 'block';
+      buildForms();
+      updateUserUI();
+    }
+
+    function showLogin() {
+      $('#app').style.display = 'none';
+      $('#loginScreen').style.display = 'flex';
+    }
+
+    function resetFilters() {
+      const search = $('#searchInput');
+      const unidade = $('#filterUnidade');
+      const status = $('#filterStatus');
+      const sort = $('#filterSort');
+      if (search) search.value = '';
+      if (status) status.value = 'Todos';
+      if (sort) sort.value = 'data_desc';
+      if (unidade) unidade.value = currentUser && !isAdmin() ? userUnit() : 'Todas';
+    }
+
+    async function logout() {
+      try {
+        if (supabaseClient && sessionToken) await supabaseClient.rpc('superacao_logout', { p_token: sessionToken });
+      } catch (e) {}
+      currentUser = null;
+      sessionToken = null;
+      records = [];
+      users = [];
+      editingId = null;
+      isSavingRecord = false;
+      lastLoadedAt = null;
+      sessionStorage.removeItem(SESSION_KEY);
+      showLogin();
+      $('#loginForm').reset();
+      $('#loginError').classList.remove('show');
+      resetFilters();
+    }
+
+    function fieldHTML(name, label, type='text', extra='') {
+      return `<div class="field"><label>${label}</label><input type="${type}" name="${name}" class="input" ${extra} /></div>`;
+    }
+
+    function selectHTML(name, label, options, extra='') {
+      return `<div class="field"><label>${label}</label><select name="${name}" class="select" ${extra}>${options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}</select></div>`;
+    }
+
+    function textareaHTML(name, label, span='span-4') {
+      return `<div class="field ${span}"><label>${label}</label><textarea name="${name}" class="textarea" rows="4"></textarea></div>`;
+    }
+
+    function buildFormHTML() {
+      const base = `
+        ${fieldHTML('data_solicitacao','Data da solicitação','date','required')}
+        ${fieldHTML('aluno','Nome do aluno','text','required')}
+        ${fieldHTML('matricula','Matrícula','text','required')}
+        ${selectHTML('unidade','Unidade', UNIT_LIST,'required')}
+        ${fieldHTML('inicio_plano','Início do plano','date','required')}
+        ${fieldHTML('fim_plano','Final do plano','date','required')}
+        ${selectHTML('plano_cancelamento','Plano de cancelamento', PLANOS,'required')}
+        ${fieldHTML('dados_bancarios','Dados bancários','text','required')}
+        ${fieldHTML('consultor','Consultor','text','required')}
+        ${fieldHTML('motivo','Motivo','text','required')}
+      `;
+
+      const admin = isAdmin() ? `
+        <div class="section-title">Revisão do ADM</div>
+        ${selectHTML('status','Status', STATUS_LIST)}
+        ${fieldHTML('meses_faltantes','Meses que faltam','number','min="0" step="1" data-calc="1"')}
+        ${fieldHTML('valor_mensalidade','Valor mensalidade / mês','number','min="0" step="0.01" data-calc="1"')}
+        ${fieldHTML('multa_meses_view','Multa do plano','text','readonly')}
+        ${fieldHTML('meses_receber_view','Meses que o aluno vai receber','text','readonly')}
+        ${fieldHTML('valor_multa_view','Valor da multa','text','readonly')}
+        ${fieldHTML('valor_reembolso_view','Valor final do reembolso','text','readonly')}
+        ${textareaHTML('observacoes_adm','Observações do ADM')}
+      ` : '';
+
+      return `
+        ${base}
+        ${admin}
+        <div class="span-4" style="display:flex;gap:12px;flex-wrap:wrap">
+          <button class="btn btn-primary" type="submit">Salvar</button>
+          <button class="btn btn-light" type="button" data-action-form="clear">Limpar</button>
+        </div>
+      `;
+    }
+
+    function buildForms() {
+      $('#formCadastro').innerHTML = buildFormHTML();
+      $('#modalCadastro').innerHTML = buildFormHTML();
+      bindFormCalc($('#formCadastro'));
+      bindFormCalc($('#modalCadastro'));
+      clearForm($('#formCadastro'));
+      clearForm($('#modalCadastro'));
+    }
+
+    function bindFormCalc(formEl) {
+      if (formEl.dataset.boundCalc === '1') return;
+      formEl.dataset.boundCalc = '1';
+      formEl.addEventListener('input', () => updateCalcPreview(formEl));
+      formEl.addEventListener('change', () => updateCalcPreview(formEl));
+      formEl.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-action-form="clear"]');
+        if (btn) {
+          editingId = null;
+          clearForm(formEl);
+        }
+      });
+    }
+
+    function updateCalcPreview(formEl) {
+      if (!isAdmin()) return;
+      const payload = formDataToObject(formEl, true);
+      const calc = calcValues(payload);
+      const multaView = formEl.querySelector('[name="multa_meses_view"]');
+      const mesesReceberView = formEl.querySelector('[name="meses_receber_view"]');
+      const valorMultaView = formEl.querySelector('[name="valor_multa_view"]');
+      const valorFinalView = formEl.querySelector('[name="valor_reembolso_view"]');
+      if (multaView) multaView.value = `${calc.multa_meses} mês(es)`;
+      if (mesesReceberView) mesesReceberView.value = `${calc.meses_receber} mês(es)`;
+      if (valorMultaView) valorMultaView.value = money(calc.valor_multa);
+      if (valorFinalView) valorFinalView.value = money(calc.valor_reembolso);
+    }
+
+    function clearForm(formEl) {
+      formEl.reset();
+      const solicitacao = formEl.querySelector('[name="data_solicitacao"]');
+      if (solicitacao) solicitacao.value = todayLocalISO();
+      const unidadeSelect = formEl.querySelector('[name="unidade"]');
+      if (unidadeSelect) {
+        unidadeSelect.value = isAdmin() ? 'UR-03' : userUnit();
+        unidadeSelect.disabled = !isAdmin();
+      }
+      const plano = formEl.querySelector('[name="plano_cancelamento"]');
+      if (plano) plano.value = 'Semestral';
+      const status = formEl.querySelector('[name="status"]');
+      if (status) status.value = 'Recebido da unidade';
+      updateCalcPreview(formEl);
+    }
+
+    function fillForm(formEl, item) {
+      const set = (name, value) => {
+        const el = formEl.querySelector(`[name="${name}"]`);
+        if (el) el.value = value ?? '';
+      };
+      set('data_solicitacao', item?.data_solicitacao || '');
+      set('aluno', item?.aluno || '');
+      set('matricula', item?.matricula || '');
+      set('unidade', isAdmin() ? (item?.unidade || 'UR-03') : userUnit());
+      set('inicio_plano', item?.inicio_plano || '');
+      set('fim_plano', item?.fim_plano || '');
+      set('plano_cancelamento', item?.plano_cancelamento || 'Semestral');
+      set('dados_bancarios', item?.dados_bancarios || '');
+      set('consultor', item?.consultor || '');
+      set('motivo', item?.motivo || '');
+      set('status', item?.status || 'Recebido da unidade');
+      set('meses_faltantes', item?.meses_faltantes ?? '');
+      set('valor_mensalidade', item?.valor_mensalidade ?? '');
+      set('observacoes_adm', item?.observacoes_adm || '');
+
+      const unidadeSelect = formEl.querySelector('[name="unidade"]');
+      if (unidadeSelect) unidadeSelect.disabled = !isAdmin();
+      updateCalcPreview(formEl);
+    }
+
+    function formDataToObject(formEl, includeAdmin=false) {
+      const fd = new FormData(formEl);
+      const base = {
+        data_solicitacao: fd.get('data_solicitacao') || null,
+        aluno: clean(fd.get('aluno')),
+        matricula: clean(fd.get('matricula')),
+        unidade: isAdmin() ? (clean(fd.get('unidade')) || 'UR-03') : userUnit(),
+        inicio_plano: fd.get('inicio_plano') || null,
+        fim_plano: fd.get('fim_plano') || null,
+        plano_cancelamento: clean(fd.get('plano_cancelamento')) || 'Semestral',
+        dados_bancarios: clean(fd.get('dados_bancarios')),
+        consultor: clean(fd.get('consultor')),
+        motivo: clean(fd.get('motivo'))
+      };
+
+      if (isAdmin() && includeAdmin) {
+        return {
+          ...base,
+          status: clean(fd.get('status')) || 'Recebido da unidade',
+          meses_faltantes: Number(fd.get('meses_faltantes') || 0),
+          valor_mensalidade: Number(fd.get('valor_mensalidade') || 0),
+          observacoes_adm: clean(fd.get('observacoes_adm'))
+        };
+      }
+
+      return base;
+    }
+
+    function validatePayload(payload, includeAdmin=false) {
+      if (!payload.data_solicitacao) return 'Informe a data da solicitação.';
+      if (!payload.aluno) return 'Informe o nome do aluno.';
+      if (!payload.matricula) return 'Informe a matrícula.';
+      if (!payload.inicio_plano) return 'Informe o início do plano.';
+      if (!payload.fim_plano) return 'Informe o final do plano.';
+      if (!payload.plano_cancelamento) return 'Informe o plano de cancelamento.';
+      if (!payload.dados_bancarios) return 'Informe os dados bancários.';
+      if (!payload.consultor) return 'Informe o consultor.';
+      if (!payload.motivo) return 'Informe o motivo.';
+      if (payload.inicio_plano && payload.fim_plano && payload.fim_plano < payload.inicio_plano) return 'O final do plano não pode ser anterior ao início.';
+      if (includeAdmin) {
+        if (!Number.isFinite(payload.meses_faltantes) || payload.meses_faltantes < 0) return 'Informe um número válido de meses faltantes.';
+        if (!Number.isFinite(payload.valor_mensalidade) || payload.valor_mensalidade < 0) return 'Informe um valor mensal válido.';
+      }
+      return '';
+    }
+
+    function setActiveTab(name) {
+      if ((name === 'dashboard' || name === 'usuarios') && !isAdmin()) name = 'lista';
+      $$('.tab').forEach(tab => tab.classList.toggle('active', tab.dataset.tab === name));
+      $('#panel-lista').classList.toggle('active', name === 'lista');
+      $('#panel-dashboard').classList.toggle('active', name === 'dashboard');
+      $('#panel-cadastro').classList.toggle('active', name === 'cadastro');
+      $('#panel-usuarios').classList.toggle('active', name === 'usuarios');
+      if (name === 'usuarios') loadUsers();
+    }
+
+    function openModal(item=null) {
+      if (item && !userCanSeeUnit(item.unidade)) {
+        showNotice('Esse login não tem permissão para ver esse registro.', 'err');
+        return;
+      }
+      if (item && !isAdmin()) {
+        showNotice('Login de unidade não edita cancelamento enviado. Solicite correção ao ADM.', 'err');
+        return;
+      }
+      editingId = item?.id || null;
+      $('#modalTitle').textContent = editingId ? 'Revisar cancelamento' : 'Novo cancelamento';
+      $('#modalHint').textContent = isAdmin()
+        ? 'Revise os dados enviados pela unidade e preencha o cálculo administrativo.'
+        : 'Envie um novo cancelamento. Registros já enviados só podem ser alterados pelo ADM.';
+      fillForm($('#modalCadastro'), item || null);
+      $('#modalForm').classList.add('show');
+    }
+
+    function closeModal() {
+      editingId = null;
+      clearForm($('#modalCadastro'));
+      $('#modalForm').classList.remove('show');
+    }
+
+    function setBusyState(disabled) {
+      ['#btnNovo', '#btnExportar', '#btnImprimir', '#btnAtualizar', '#btnNovoCadastro', '#btnNovoUsuario'].forEach(sel => {
+        const el = $(sel);
+        if (el) el.disabled = !!disabled;
+      });
+    }
+
+    function setFormSubmitting(formEl, submitting) {
+      const submit = formEl.querySelector('button[type="submit"]');
+      if (!submit) return;
+      if (!submit.dataset.defaultLabel) submit.dataset.defaultLabel = submit.textContent;
+      submit.disabled = !!submitting;
+      submit.textContent = submitting
+        ? (editingId ? 'Salvando revisão...' : 'Enviando...')
+        : submit.dataset.defaultLabel;
+    }
+
+    async function waitForSupabase() {
+      let attempts = 0;
+      while (attempts < 60) {
+        if (window.supabase && window.supabase.createClient) return true;
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+      throw new Error('Supabase não carregou.');
+    }
+
+    async function initClient() {
+      if (!isConfigured()) throw new Error('Supabase não configurado.');
+      await waitForSupabase();
+      supabaseClient = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseAnonKey);
+    }
+
+    async function loadRecords() {
+      if (!supabaseClient || !sessionToken) throw new Error('Sessão não iniciada.');
+      const { data, error } = await supabaseClient.rpc('superacao_list_cancelamentos', { p_token: sessionToken });
+      if (error) throw error;
+      records = data || [];
+      lastLoadedAt = new Date();
+    }
+
+    async function reloadAndRender() {
+      await loadRecords();
+      renderAll(true);
+    }
+
+    async function loadUsers() {
+      if (!isAdmin() || !supabaseClient || !sessionToken) return;
+      const { data, error } = await supabaseClient.rpc('superacao_list_usuarios', { p_token: sessionToken });
+      if (error) {
+        console.error(error);
+        showNotice('Erro ao carregar usuários.', 'err');
+        return;
+      }
+      users = data || [];
+      renderUsers();
+    }
+
+    async function createRecord(payload) {
+      const { error } = await supabaseClient.rpc('superacao_create_cancelamento', {
+        p_token: sessionToken,
+        p_data_solicitacao: payload.data_solicitacao,
+        p_aluno: payload.aluno,
+        p_matricula: payload.matricula,
+        p_unidade: payload.unidade,
+        p_inicio_plano: payload.inicio_plano,
+        p_fim_plano: payload.fim_plano,
+        p_plano_cancelamento: payload.plano_cancelamento,
+        p_dados_bancarios: payload.dados_bancarios,
+        p_consultor: payload.consultor,
+        p_motivo: payload.motivo,
+        p_status: payload.status || null,
+        p_meses_faltantes: payload.meses_faltantes ?? null,
+        p_valor_mensalidade: payload.valor_mensalidade ?? null,
+        p_observacoes_adm: payload.observacoes_adm || null
+      });
+      if (error) throw error;
+      await reloadAndRender();
+    }
+
+    async function updateRecord(id, payload) {
+      const { error } = await supabaseClient.rpc('superacao_update_cancelamento', {
+        p_token: sessionToken,
+        p_id: id,
+        p_data_solicitacao: payload.data_solicitacao,
+        p_aluno: payload.aluno,
+        p_matricula: payload.matricula,
+        p_unidade: payload.unidade,
+        p_inicio_plano: payload.inicio_plano,
+        p_fim_plano: payload.fim_plano,
+        p_plano_cancelamento: payload.plano_cancelamento,
+        p_dados_bancarios: payload.dados_bancarios,
+        p_consultor: payload.consultor,
+        p_motivo: payload.motivo,
+        p_status: payload.status || null,
+        p_meses_faltantes: payload.meses_faltantes ?? null,
+        p_valor_mensalidade: payload.valor_mensalidade ?? null,
+        p_observacoes_adm: payload.observacoes_adm || null
+      });
+      if (error) throw error;
+      await reloadAndRender();
+    }
+
+    async function removeRecord(id) {
+      if (!isAdmin()) throw new Error('Somente ADM pode excluir.');
+      const { error } = await supabaseClient.rpc('superacao_delete_cancelamento', {
+        p_token: sessionToken,
+        p_id: id
+      });
+      if (error) throw error;
+      await reloadAndRender();
+    }
+
+    async function saveFromForm(formEl, closeAfter=false) {
+      if (isSavingRecord) return;
+      const payload = formDataToObject(formEl, isAdmin());
+      const validation = validatePayload(payload, isAdmin());
+      if (validation) {
+        showNotice(validation, 'err');
+        return;
+      }
+      try {
+        isSavingRecord = true;
+        setBusyState(true);
+        setFormSubmitting(formEl, true);
+        if (editingId && !isAdmin()) {
+          showNotice('Login de unidade não pode editar registros enviados. Solicite correção ao ADM.', 'err');
+          return;
+        }
+        if (editingId) {
+          await updateRecord(editingId, payload);
+          showNotice('Registro revisado com sucesso.', 'ok');
+        } else {
+          await createRecord(payload);
+          showNotice('Cancelamento enviado com sucesso.', 'ok');
+        }
+        clearForm(formEl);
+        editingId = null;
+        if (closeAfter) closeModal();
+        setActiveTab('lista');
+      } catch (err) {
+        console.error(err);
+        showNotice(err.message || 'Erro ao salvar. Rode o SQL v11 e confira a conexão.', 'err');
+      } finally {
+        isSavingRecord = false;
+        setBusyState(false);
+        setFormSubmitting(formEl, false);
+      }
+    }
+
+    async function changeStatus(id, status) {
+      if (!isAdmin()) return;
+      try {
+        const { error } = await supabaseClient.rpc('superacao_update_status', {
+          p_token: sessionToken,
+          p_id: id,
+          p_status: status
+        });
+        if (error) throw error;
+        await reloadAndRender();
+        showNotice('Status atualizado.', 'ok');
+      } catch (err) {
+        console.error(err);
+        showNotice('Erro ao alterar o status.', 'err');
+      }
+    }
+
+    function buildExcelRows(data) {
+      return data.map(item => ({
+        'Data Solicitação': dateBR(item.data_solicitacao),
+        'Aluno': item.aluno || '',
+        'Matrícula': item.matricula || '',
+        'Unidade': item.unidade || '',
+        'Início Plano': dateBR(item.inicio_plano),
+        'Final Plano': dateBR(item.fim_plano),
+        'Plano Cancelamento': item.plano_cancelamento || '',
+        'Dados Bancários': item.dados_bancarios || '',
+        'Consultor': item.consultor || '',
+        'Motivo': item.motivo || '',
+        'Status': item.status || '',
+        'Meses que Faltam': Number(item.meses_faltantes || 0),
+        'Multa em Meses': Number(item.multa_meses || 0),
+        'Meses que Recebe': Number(item.meses_receber || 0),
+        'Valor Mensalidade': Number(item.valor_mensalidade || 0),
+        'Valor da Multa': Number(item.valor_multa || 0),
+        'Valor Reembolso': Number(item.valor_reembolso || 0),
+        'Observações ADM': item.observacoes_adm || ''
+      }));
+    }
+
+    function exportExcel() {
+      if (!isAdmin()) return;
+      if (!window.XLSX) {
+        showNotice('Biblioteca do Excel não carregou. Verifique a internet.', 'err');
+        return;
+      }
+      const data = filteredRecords();
+      if (!data.length) {
+        showNotice('Não há registros no filtro atual para exportar.', 'warn');
+        return;
+      }
+      const wb = XLSX.utils.book_new();
+      const stats = getStats(data);
+      const resumoSheet = [
+        ['Academia Superação - Relatório de Cancelamentos'],
+        ['Gerado em', new Date().toLocaleString('pt-BR')],
+        ['Filtro Unidade', $('#filterUnidade').value],
+        ['Filtro Status', $('#filterStatus').value],
+        ['Busca', $('#searchInput').value || '-'],
+        [],
+        ['Total de registros', data.length],
+        ['Total em reembolso', Number(stats.totalReembolso || 0)],
+        ['Recebidos da unidade', stats.recebidos],
+        ['Em análise', stats.analise],
+        ['Concluídos/Reembolsados', stats.concluidos]
+      ];
+
+      const wsResumo = XLSX.utils.aoa_to_sheet(resumoSheet);
+      wsResumo['!cols'] = [{wch:30},{wch:24}];
+      XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo');
+
+      const wsDados = XLSX.utils.json_to_sheet(buildExcelRows(data));
+      wsDados['!cols'] = [
+        {wch:16},{wch:26},{wch:14},{wch:16},{wch:14},{wch:14},{wch:18},{wch:26},
+        {wch:18},{wch:24},{wch:18},{wch:16},{wch:14},{wch:16},{wch:16},{wch:16},{wch:16},{wch:32}
+      ];
+      XLSX.utils.book_append_sheet(wb, wsDados, 'Cancelamentos');
+
+      XLSX.writeFile(wb, `cancelamentos_superacao_${todayLocalISO()}.xlsx`);
+      showNotice('Excel exportado com sucesso.', 'ok');
+    }
+
+    function buildPrintHTML(data) {
+      const stats = getStats(data);
+      const filtros = currentFilters();
+      const linhas = data.map(item => `
+        <tr>
+          <td>${escapeHtml(item.data_solicitacao ? dateBR(item.data_solicitacao) : '')}</td>
+          <td>${escapeHtml(item.aluno || '')}</td>
+          <td>${escapeHtml(item.matricula || '')}</td>
+          <td>${escapeHtml(item.unidade || '')}</td>
+          <td>${escapeHtml(item.consultor || '')}</td>
+          <td>${escapeHtml(item.plano_cancelamento || '')}</td>
+          <td>${Number(item.meses_faltantes || 0)}</td>
+          <td>${Number(item.multa_meses || 0)}</td>
+          <td>${Number(item.meses_receber || 0)}</td>
+          <td>${money(item.valor_mensalidade)}</td>
+          <td>${money(item.valor_multa)}</td>
+          <td>${money(item.valor_reembolso)}</td>
+          <td>${escapeHtml(item.status || '')}</td>
+          <td>${escapeHtml(item.dados_bancarios || '')}</td>
+          <td>${escapeHtml(item.motivo || '')}</td>
+        </tr>
+      `).join('');
+
+      return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Relatório de Cancelamentos</title>
+<style>
+  @page{size:A4 landscape;margin:9mm}
+  body{font-family:Arial,Helvetica,sans-serif;color:#0f172a;margin:0;padding:0}
+  .head{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;margin-bottom:14px}
+  .brand{font-size:11px;font-weight:700;color:#0e6a2b;letter-spacing:.08em;text-transform:uppercase}
+  h1{margin:4px 0 6px;font-size:22px}
+  p{margin:0;color:#475569;line-height:1.35;font-size:12px}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+  .box{border:1px solid #d9e5dd;border-radius:10px;padding:8px}
+  .label{font-size:10px;color:#64748b;text-transform:uppercase;font-weight:700}
+  .value{font-size:17px;font-weight:800;margin-top:4px;color:#0f172a}
+  .meta{margin:10px 0 12px;padding:9px;background:#f8fafc;border-radius:10px;border:1px solid #e5e7eb;font-size:11px}
+  table{width:100%;border-collapse:collapse;font-size:9px;table-layout:auto}
+  th,td{border:1px solid #dbe3ea;padding:5px;text-align:left;vertical-align:top;word-break:break-word}
+  th{background:#eef7f0;color:#0e6a2b}
+  .foot{margin-top:8px;font-size:10px;color:#64748b}
+</style>
+</head>
+<body>
+  <div class="head">
+    <div>
+      <div class="brand">Academia Superação</div>
+      <h1>Relatório de Cancelamentos</h1>
+      <p>Relatório administrativo em paisagem com cálculo de plano, multa e reembolso.</p>
+    </div>
+    <div style="text-align:right">
+      <div class="label">Emitido em</div>
+      <div style="font-weight:700;font-size:12px">${new Date().toLocaleString('pt-BR')}</div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="box"><div class="label">Registros</div><div class="value">${data.length}</div></div>
+    <div class="box"><div class="label">Total em Reembolso</div><div class="value">${money(stats.totalReembolso)}</div></div>
+    <div class="box"><div class="label">Recebidos</div><div class="value">${stats.recebidos}</div></div>
+    <div class="box"><div class="label">Em análise</div><div class="value">${stats.analise}</div></div>
+  </div>
+
+  <div class="meta">
+    <strong>Filtros:</strong>
+    Unidade: ${escapeHtml(filtros.unidade)} |
+    Status: ${escapeHtml(filtros.status)} |
+    Ordem: ${escapeHtml(document.querySelector('#filterSort option:checked')?.textContent || '')} |
+    Busca: ${escapeHtml($('#searchInput').value || '-')}
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Data</th><th>Aluno</th><th>Matrícula</th><th>Unidade</th><th>Consultor</th>
+        <th>Plano</th><th>Faltam</th><th>Multa</th><th>Recebe</th>
+        <th>Mensal</th><th>Valor Multa</th><th>Reembolso</th><th>Status</th><th>Dados Bancários</th><th>Motivo</th>
+      </tr>
+    </thead>
+    <tbody>${linhas || '<tr><td colspan="15">Nenhum registro encontrado.</td></tr>'}</tbody>
+  </table>
+
+  <div class="foot"></div>
+</body>
+</html>`;
+    }
+
+    function printReport() {
+      if (!isAdmin()) return;
+      const data = filteredRecords();
+      if (!data.length) {
+        showNotice('Não há registros no filtro atual para imprimir.', 'warn');
+        return;
+      }
+      const printWindow = window.open('', '_blank', 'width=1400,height=900');
+      if (!printWindow) {
+        showNotice('O navegador bloqueou a janela de impressão.', 'err');
+        return;
+      }
+      printWindow.document.open();
+      printWindow.document.write(buildPrintHTML(data));
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => { printWindow.print(); }, 450);
+    }
+
+    async function iniciarSessaoPorToken(token) {
+      await initClient();
+      const { data, error } = await supabaseClient.rpc('superacao_session', { p_token: token });
+      if (error || !data || !data.length) throw error || new Error('Sessão inválida.');
+      sessionToken = token;
+      currentUser = data[0];
+      resetFilters();
+      showApp();
+      renderAll(false);
+      await loadRecords();
+      if (isAdmin()) await loadUsers();
+      renderAll(true);
+    }
+
+    async function iniciarSessaoPorLogin(login, senha) {
+      await initClient();
+      const { data, error } = await supabaseClient.rpc('superacao_login', {
+        p_login: login,
+        p_senha: senha
+      });
+      if (error || !data || !data.length) throw error || new Error('Login inválido.');
+      sessionToken = data[0].token;
+      currentUser = {
+        id: data[0].usuario_id,
+        login: data[0].login,
+        nome: data[0].nome,
+        perfil: data[0].perfil,
+        unidade: data[0].unidade
+      };
+      resetFilters();
+      sessionStorage.setItem(SESSION_KEY, sessionToken);
+      $('#loginError').classList.remove('show');
+      showApp();
+      renderAll(false);
+      await loadRecords();
+      if (isAdmin()) await loadUsers();
+      renderAll(true);
+    }
+
+    function clearUserForm() {
+      $('#formUsuario').reset();
+      $('#formUsuario [name="id"]').value = '';
+      $('#formUsuario [name="perfil"]').value = 'unidade';
+      $('#formUsuario [name="unidade"]').value = 'UR-03';
+      $('#formUsuario [name="ativo"]').value = 'true';
+    }
+
+    function fillUserForm(user) {
+      const form = $('#formUsuario');
+      form.querySelector('[name="id"]').value = user.id;
+      form.querySelector('[name="login"]').value = user.login || '';
+      form.querySelector('[name="senha"]').value = '';
+      form.querySelector('[name="nome"]').value = user.nome || '';
+      form.querySelector('[name="perfil"]').value = user.perfil || 'unidade';
+      form.querySelector('[name="unidade"]').value = user.unidade || 'UR-03';
+      form.querySelector('[name="ativo"]').value = String(!!user.ativo);
+      setActiveTab('usuarios');
+    }
+
+    async function saveUser() {
+      if (!isAdmin()) return;
+      const form = $('#formUsuario');
+      const fd = new FormData(form);
+      const id = clean(fd.get('id'));
+      const payload = {
+        p_token: sessionToken,
+        p_login: clean(fd.get('login')),
+        p_senha: clean(fd.get('senha')),
+        p_nome: clean(fd.get('nome')),
+        p_perfil: clean(fd.get('perfil')) || 'unidade',
+        p_unidade: clean(fd.get('unidade')) || 'UR-03',
+        p_ativo: fd.get('ativo') === 'true'
+      };
+
+      if (!payload.p_login) return showNotice('Informe o login do usuário.', 'err');
+      if (!payload.p_nome) return showNotice('Informe o nome do usuário.', 'err');
+      if (!id && !payload.p_senha) return showNotice('Informe a senha inicial do usuário.', 'err');
+
+      try {
+        if (id) {
+          const { error } = await supabaseClient.rpc('superacao_update_usuario', { ...payload, p_id: id });
+          if (error) throw error;
+          showNotice('Usuário atualizado.', 'ok');
+        } else {
+          const { error } = await supabaseClient.rpc('superacao_create_usuario', payload);
+          if (error) throw error;
+          showNotice('Usuário criado.', 'ok');
+        }
+        clearUserForm();
+        await loadUsers();
+      } catch (err) {
+        console.error(err);
+        showNotice(err.message || 'Erro ao salvar usuário.', 'err');
+      }
+    }
+
+    async function deleteUser(id) {
+      if (!isAdmin()) return;
+      if (!confirm('Deseja excluir esse usuário?')) return;
+      try {
+        const { error } = await supabaseClient.rpc('superacao_delete_usuario', {
+          p_token: sessionToken,
+          p_id: id
+        });
+        if (error) throw error;
+        showNotice('Usuário excluído.', 'ok');
+        await loadUsers();
+      } catch (err) {
+        console.error(err);
+        showNotice(err.message || 'Erro ao excluir usuário.', 'err');
+      }
+    }
+
+    function bindEvents() {
+      $('#loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(e.currentTarget);
+        try {
+          await iniciarSessaoPorLogin(fd.get('login'), fd.get('senha'));
+        } catch (err) {
+          console.error(err);
+          const el = $('#loginError');
+          el.textContent = err?.message || 'Login ou senha inválidos.';
+          el.classList.add('show');
+        }
+      });
+
+      $('#btnSair').addEventListener('click', logout);
+      $$('.tab').forEach(tab => tab.addEventListener('click', () => setActiveTab(tab.dataset.tab)));
+      $('#searchInput').addEventListener('input', renderAll);
+      $('#filterUnidade').addEventListener('change', renderAll);
+      $('#filterStatus').addEventListener('change', renderAll);
+      $('#filterSort').addEventListener('change', renderAll);
+
+      $('#btnAtualizar').addEventListener('click', async () => {
+        try { await reloadAndRender(); if (isAdmin()) await loadUsers(); showNotice('Dados atualizados.', 'ok'); }
+        catch (err) { console.error(err); showNotice('Erro ao atualizar os dados.', 'err'); }
+      });
+
+      $('#btnExportar').addEventListener('click', exportExcel);
+      $('#btnImprimir').addEventListener('click', printReport);
+      $('#btnNovo').addEventListener('click', () => openModal());
+      $('#btnNovoCadastro').addEventListener('click', () => { editingId = null; clearForm($('#formCadastro')); setActiveTab('cadastro'); });
+      $('#btnFecharModal').addEventListener('click', closeModal);
+      $('#modalForm').addEventListener('click', (e) => { if (e.target.id === 'modalForm') closeModal(); });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('#modalForm').classList.contains('show')) closeModal(); });
+
+      $('#formCadastro').addEventListener('submit', async (e) => { e.preventDefault(); await saveFromForm($('#formCadastro')); });
+      $('#modalCadastro').addEventListener('submit', async (e) => { e.preventDefault(); await saveFromForm($('#modalCadastro'), true); });
+
+      $('#recordList').addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        const id = btn.dataset.id;
+        const action = btn.dataset.action;
+        const item = records.find(r => String(r.id) === String(id));
+        if (!item) return;
+
+        if (action === 'edit') {
+          if (!isAdmin()) {
+            showNotice('Login de unidade não pode editar registros enviados. Solicite correção ao ADM.', 'err');
+            return;
+          }
+          openModal(item);
+        }
+        if (action === 'delete') {
+          if (!isAdmin()) return;
+          if (!confirm('Deseja excluir esse cancelamento?')) return;
+          try { await removeRecord(id); showNotice('Registro excluído.', 'ok'); }
+          catch (err) { console.error(err); showNotice(err.message || 'Erro ao excluir o registro.', 'err'); }
+        }
+      });
+
+      $('#recordList').addEventListener('change', async (e) => {
+        const select = e.target.closest('[data-action="status"]');
+        if (!select) return;
+        await changeStatus(select.dataset.id, select.value);
+      });
+
+      $('#formUsuario').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        await saveUser();
+      });
+      $('#btnLimparUsuario').addEventListener('click', clearUserForm);
+      $('#btnNovoUsuario').addEventListener('click', () => {
+        clearUserForm();
+        setActiveTab('usuarios');
+      });
+      $('#userList').addEventListener('click', async (e) => {
+        const btn = e.target.closest('[data-user-action]');
+        if (!btn) return;
+        const id = btn.dataset.id;
+        const user = users.find(u => String(u.id) === String(id));
+        if (!user) return;
+        if (btn.dataset.userAction === 'edit') fillUserForm(user);
+        if (btn.dataset.userAction === 'delete') await deleteUser(id);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      bindEvents();
+      showLogin();
+      const token = sessionStorage.getItem(SESSION_KEY);
+      if (token) {
+        try {
+          await iniciarSessaoPorToken(token);
+        } catch (err) {
+          console.error(err);
+          sessionStorage.removeItem(SESSION_KEY);
+          showLogin();
+        }
+      }
+    });
+  </script>
+</body>
+</html>

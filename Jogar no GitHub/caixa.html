@@ -1,0 +1,2395 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Caixa Superação</title>
+  <style>
+    :root {
+      --bg: #06110a;
+      --panel: #0a1710;
+      --panel-2: #112419;
+      --text: #f8fff9;
+      --muted: #9bb3a3;
+      --accent: #22c55e;
+      --accent-2: #15803d;
+      --accent-3: #86efac;
+      --danger: #dc2626;
+      --border: rgba(34,197,94,.18);
+      --shadow: 0 16px 38px rgba(0,0,0,.34);
+      --radius: 18px;
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(34,197,94,.18), transparent 18%),
+        radial-gradient(circle at top left, rgba(21,128,61,.18), transparent 24%),
+        radial-gradient(circle at bottom center, rgba(134,239,172,.08), transparent 25%),
+        linear-gradient(180deg, #020704 0%, #07120b 30%, var(--bg) 100%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .container {
+      width: min(1320px, calc(100% - 32px));
+      margin: 24px auto 36px;
+    }
+    .topbar {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+    .hero, .config-card, .card, .table-card {
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before, .config-card::before, .card::before, .table-card::before {
+      content: '';
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 3px;
+      background: linear-gradient(90deg, rgba(34,197,94,.0), rgba(34,197,94,.92), rgba(134,239,172,.0));
+      pointer-events: none;
+    }
+    .hero {
+      padding: 22px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.9rem;
+      line-height: 1.1;
+    }
+    .brand-row {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .brand-badge {
+      width: 74px;
+      height: 74px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      background: radial-gradient(circle at top left, rgba(187,247,208,.22), rgba(34,197,94,.14) 55%, rgba(21,128,61,.18) 100%);
+      border: 1px solid rgba(34,197,94,.28);
+      box-shadow: 0 14px 30px rgba(34,197,94,.18), inset 0 0 0 1px rgba(255,255,255,.04);
+      flex: 0 0 74px;
+      overflow: hidden;
+    }
+    .brand-badge img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 16px;
+      display: block;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,.28));
+      background: transparent;
+    }
+    .brand-kicker {
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .18em;
+      color: var(--accent-3);
+      margin-bottom: 6px;
+    }
+    .subtitle { color: var(--muted); margin: 0; }
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+    .pill {
+      background: rgba(22,163,74,.14);
+      border: 1px solid rgba(22,163,74,.28);
+      color: #dcfce7;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: .92rem;
+    }
+    .config-card {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .config-title {
+      margin: 0;
+      font-size: 1.05rem;
+    }
+    .status {
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: .94rem;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.03);
+    }
+    .status.ok { background: rgba(22,163,74,.15); color: #dcfce7; border-color: rgba(22,163,74,.35); }
+    .status.warn { background: rgba(245,158,11,.16); color: #fef3c7; border-color: rgba(245,158,11,.35); }
+    .status.info { background: rgba(59,130,246,.14); color: #dbeafe; border-color: rgba(59,130,246,.28); }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin: 18px 0;
+    }
+    .card {
+      padding: 18px;
+      min-height: 118px;
+      background: linear-gradient(180deg, rgba(16,29,21,.94), rgba(10,19,14,.92));
+    }
+    .label {
+      color: var(--muted);
+      font-size: .95rem;
+      margin-bottom: 10px;
+    }
+    .metric {
+      font-size: 1.9rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      margin-bottom: 8px;
+    }
+    .metric.positive { color: #86efac; }
+    .metric.negative { color: #fca5a5; }
+    .small {
+      color: var(--muted);
+      font-size: .9rem;
+    }
+    .main-grid {
+      display: grid;
+      grid-template-columns: .95fr 1.35fr;
+      gap: 18px;
+      align-items: start;
+    }
+    .form-card {
+      padding: 20px;
+    }
+    .form-card h2, .filters-card h2, .table-card h2 {
+      margin: 0 0 16px;
+      font-size: 1.15rem;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .field, .field-full {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field-full { grid-column: 1 / -1; }
+    label { font-size: .92rem; color: #d9fbe6; }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.03));
+      color: var(--text);
+      border-radius: 12px;
+      padding: 12px 13px;
+      font-size: .96rem;
+      outline: none;
+    }
+    input::placeholder, textarea::placeholder {
+      color: #8ca597;
+      opacity: 1;
+    }
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      padding-right: 42px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5L10 12.5L15 7.5' stroke='%23e5fff0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+      cursor: pointer;
+    }
+    select option,
+    select optgroup {
+      background: #0a1710;
+      color: #f8fff9;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: rgba(34,197,94,.72);
+      box-shadow: 0 0 0 3px rgba(34,197,94,.18);
+    }
+    textarea { min-height: 84px; resize: vertical; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .actions.compact { margin-top: 12px; }
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: .95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+    button:hover { transform: translateY(-1px); }
+    .btn-primary {
+      background: linear-gradient(180deg, #22c55e, #15803d);
+      color: white;
+      box-shadow: 0 12px 28px rgba(34,197,94,.24);
+    }
+    .btn-secondary {
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      border: 1px solid rgba(34,197,94,.18);
+    }
+    .btn-danger { background: linear-gradient(180deg, #ef4444, #b91c1c); color: white; }
+    .filters-card {
+      margin-top: 18px;
+      padding: 20px;
+    }
+    .table-card {
+      padding: 20px;
+      overflow: hidden;
+    }
+    .table-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+    .table-wrap {
+      overflow: auto;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.02);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+    }
+    th, td {
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      text-align: left;
+      font-size: .93rem;
+      vertical-align: top;
+    }
+    th {
+      background: rgba(255,255,255,.04);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    tr:hover td { background: rgba(255,255,255,.02); }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: .82rem;
+      font-weight: 700;
+    }
+    .tag.in { background: rgba(22,163,74,.15); color: #bbf7d0; }
+    .tag.out { background: rgba(220,38,38,.14); color: #fecaca; }
+    .row-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .row-actions button {
+      padding: 8px 10px;
+      font-size: .82rem;
+      border-radius: 10px;
+    }
+    .hint {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: .88rem;
+      line-height: 1.5;
+    }
+    .filter-note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: .84rem;
+      line-height: 1.45;
+    }
+    .empty {
+      padding: 24px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .inline-note {
+      color: #d3e7d8;
+      font-size: .9rem;
+      line-height: 1.5;
+      margin-top: 6px;
+    }
+    .app-footer {
+      margin-top: 18px;
+      text-align: center;
+      color: rgba(211,231,216,.46);
+      font-size: .72rem;
+      letter-spacing: .02em;
+    }
+    .system-card {
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(34,197,94,.16);
+      background: linear-gradient(180deg, rgba(12,24,17,.92), rgba(8,16,11,.92));
+    }
+    .system-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .system-row strong {
+      font-size: .95rem;
+      color: #f8fff9;
+    }
+    .section-title {
+      margin: 0 0 12px;
+      font-size: 1.05rem;
+    }
+    .dual-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin: 0 0 18px;
+    }
+    .subpanel {
+      padding: 20px;
+    }
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .mini-card {
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(19,36,25,.9), rgba(11,21,15,.9));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+    }
+    .mini-label {
+      color: var(--muted);
+      font-size: .9rem;
+      margin-bottom: 8px;
+    }
+    .mini-metric {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+    }
+    .mini-metric.positive { color: #86efac; }
+    .mini-metric.negative { color: #fca5a5; }
+    .admin-card {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(34,197,94,.16);
+      background: linear-gradient(180deg, rgba(12,24,17,.92), rgba(8,16,11,.92));
+    }
+    .admin-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .admin-title strong {
+      font-size: .95rem;
+      color: #f8fff9;
+    }
+    .admin-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .03em;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+      color: #d3e7d8;
+    }
+    .admin-badge.on {
+      background: rgba(34,197,94,.16);
+      color: #dcfce7;
+      border-color: rgba(34,197,94,.26);
+    }
+    .admin-badge.basic {
+      background: rgba(59,130,246,.14);
+      color: #dbeafe;
+      border-color: rgba(59,130,246,.24);
+    }
+    .admin-badge.off {
+      background: rgba(239,68,68,.12);
+      color: #fecaca;
+      border-color: rgba(239,68,68,.22);
+    }
+    .admin-note {
+      color: var(--muted);
+      font-size: .84rem;
+      line-height: 1.45;
+      margin: 0 0 12px;
+    }
+    .admin-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .user-manager {
+      display: none;
+    }
+    .user-manager.open {
+      display: block;
+    }
+    .unit-checks {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 10px;
+      border-radius: 12px;
+      border: 1px solid rgba(34,197,94,.15);
+      background: rgba(255,255,255,.03);
+      color: #d9fbe6;
+      font-size: .88rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .check-item input {
+      width: auto;
+      accent-color: #22c55e;
+    }
+    .user-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+      max-height: 320px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+    .user-item {
+      border: 1px solid rgba(34,197,94,.14);
+      background: rgba(255,255,255,.03);
+      border-radius: 14px;
+      padding: 10px;
+    }
+    .user-item-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    .user-name {
+      font-weight: 800;
+      color: #f8fff9;
+    }
+    .user-meta {
+      color: var(--muted);
+      font-size: .82rem;
+      margin-top: 3px;
+      line-height: 1.35;
+    }
+    .user-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .user-actions button {
+      padding: 8px 10px;
+      font-size: .8rem;
+      border-radius: 10px;
+    }
+    .row-actions button:disabled {
+      opacity: .52;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none;
+      filter: grayscale(.18);
+    }
+    select:disabled, input:disabled, textarea:disabled, button:disabled {
+      opacity: .65;
+      cursor: not-allowed;
+    }
+    @media (max-width: 1080px) {
+      .topbar, .main-grid, .grid-4, .dual-grid { grid-template-columns: 1fr 1fr; }
+      .main-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 760px) {
+      .topbar, .grid-4, .form-grid, .dual-grid, .mini-grid { grid-template-columns: 1fr; }
+      .container { width: min(100% - 20px, 1320px); margin-top: 14px; }
+      .hero, .config-card, .card, .form-card, .filters-card, .table-card { border-radius: 16px; }
+      .brand-row { align-items: flex-start; }
+      .brand-badge { width: 62px; height: 62px; flex-basis: 62px; padding: 4px; }
+      h1 { font-size: 1.5rem; }
+      .metric { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <section class="hero">
+        <div class="brand-row">
+          <div class="brand-badge"><img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAYGBgYHBgcICAcKCwoLCg8ODAwODxYQERAREBYiFRkVFRkVIh4kHhweJB42KiYmKjY+NDI0PkxERExfWl98fKcBBgYGBgcGBwgIBwoLCgsKDw4MDA4PFhAREBEQFiIVGRUVGRUiHiQeHB4kHjYqJiYqNj40MjQ+TERETF9aX3x8p//CABEIAXkBIgMBIgACEQEDEQH/xAAyAAEAAgMBAQAAAAAAAAAAAAAAAQIDBAUGBwEBAAMBAQAAAAAAAAAAAAAAAAECAwQF/9oADAMBAAIQAxAAAALX9RklCRIAAAAAAAAAAAAAACJEJAAAAABIiQAAAAARIhIgBGGtc7n6+ePXeb2ojtjfpAAAEgAAAAAABXFWueNHWrTrYeNgx5+xrcLRPQ6Xn5vp08O36TTXh+pyTa4TIACQAAAAIwxGdoa1c+vh42PLHqa2ox570hlk1+fy+jq6GhV09acnprX43qellKzIgAACQAAMfOrXqYOJjw5errac8/LesKZyiZkTMwkRxt3z/R1wOrtbd/cGv05AACJEJEEgAqTrvPxGSmtscXnSiccJBKJQJAteUVtbg6Vq9/ps2H2E26u6khMAAAAAAqRivSI1/Men85EV2+T1+TgTCtJRbPJMJmUTSgkYczXbyS1fQ9Ta+jeY9UkACEwAAAAK2gx1vWIxcXu6Z4/rYNOmXcjLbl49eNnGYpi2WMEkka7Shnl5/U7XP7vR91vROmwAAEJgAAAApF6mOmWsRxfP+w8/EOj5z0GHNkrNaZYdrU288lbr6YK7TPLVbFa119Xf3ers66XT2QAABEwAAAAK3qUresRj5fWwHjtnZ49KekrS3NxYtrU288pmJvomJhKJMWTHCvopwZ+70kSm0AAAgAAAExIrW9SlMlYjmed9fw0czr+e6/Py5NrU2see0wteyJrWZrMzirauWPS6fD63X3Zh0dUAAAgAAAEgVtBSt6xFNDoYjyWt3ODWvYnV3efjXxxWuxfUlG3OraF61nPPZ29O2mvbnDm7fQgTIAEAAAAkAEUyVMdclIjS876vkHne/wALfw5uhMMedW8mKuxNa6y8Uzi14tbe6vnO31dmwN+oACAAAASiQBEilb1Mett44jy/M9P5yte3fS3ObjtNZiLIGOazTPPNZtadjXmZ7jW2ezvCbAQAAABMSAARW9SlL44jT8r6Xyps9bh9bHnzzWccLTWTFMTXPOiZtM1lObrcPo6a7o6uxEwAAAAASABW1CmO+KI4/netyJnJvaGzWnUmHHw2tSZUms1pnmszeyEVtkxJnu209zs9CBawAAAACYEgjHfGV1djlnn9eli18UxHeY8nPyTNZyxqiYrmVlNprJZA2Oxwe90dIb9QAETAkAAAFcV8RTzPY8gYc+vnLKjs58GXj4LqzWkTWaZ5ppOu1pgTMIjN3OX1OnsDTUACASiQABWcZXVt5owcu+MZcWQtfF0K13rVnj8+01mZiazSmSayWtjw2tt4dT0nR17eU12CZEAAAEokGAvo8zzpu8uBNbTEUvtbtM9XoQyxsxY88dq3OpfTp15l9NdzBn6hwen6DZ01wbBa4AgAAAIwmenD41a9rzmTLWnKy9HHWuDNSkV3GplmZpubszw49TtWv5HZ9blm3mdzuTM87azpRIkAAgAAAMcciIw8vDkpnjx9PdmfOz6zam3kNv1V5ee3OtKdLPmkpaUzEgAAAIJQAAAAAMGPaGtlySVmQAAAAAAAAAAAAAAIJQOJ2/D+uiNoTKYkAAAAAAAAAAAAAEAAH//EAAL/2gAMAwEAAgADAAAAIXYAADHPPPPPPPLDAAEMAABPPMIAAAAAEMOJyTQABPOAAAABDCC1uE6J4wDPIAADGNIRQSvnZKEPPPIAAChOZDSUa/NPCAEMOAAI8OlmMX3NeGNPCAAABHz0feTSO2PaAANLAAAEP2sY1J8lvhfLAANKAADJIxhmeTeWkMPKAFPAAPFLy7vGY+muYUPAAPDFPEAAwafZWyIzwPCAPPFPABL3ylPyZCrqPKAPPFPAAEJ3E53GxE0fIAPPAPCAIAJ8iwloqNXQAPMANKAEAF94wgrWLngFPAAFPAAAO5ONrOblTyvKAAANLAPHIC0IEXfANeAALAAPOHEOFBmARx71IAAPCAEOOBMCoByuLXowBPEPCBCPJ1OnKA95QABPPAGNr0h1KXy88QAADPOAA8Ouhe+4IAAABDPPIAAJOEAMNPPPPPPPPMAABDKvKAAAAMMMMMAAAABPPP/EAAL/2gAMAwEAAgADAAAAENoBHMLHPPPPPLHMPCEMAHOBPMIAADCAEMPHqNgnOHOADHPOMMOuNHXsNPMHIBHMJMlSwSOTtMEPDHIBPP086e8bO/NMNCEMOBOJLkyzXgg1eGNLNCAAHN6gu2afUCPbLCNPPDFKL5bbWiHMN9TGLANFPHIKJ+0DwHtIWcPHKFKPPHJH+NlQvYthCUKPAPPKPEDGyOHfhLdzwPNAPPKPAGGwOuQJRCnKvFKPPKPAPEM/uJfMgvMNHAPPPNCPDLJFxC027EyfAPPNHIFLPLyNLC8Eei6FKPEKPANIB5NdqZ0gsAPFPANGLAFPNE8XR3o+tbPMLEPMOMBCDGVy4ZZanIANCELHCNHBOIcdjjn+BPLNCAGNNFqkSS/XnIBPMNLA475AP9UkDXMADOJPA7jUObCwIMIABDPMHOAEGIHDOMPPPPPOMDPIBDFPKANPPDDDDDPPMABPPP/EADIRAAIBAwIEBAQGAgMAAAAAAAECAwAEERIhBTAxQTJRYXETFCKBI0JDUFKxEGJAkaH/2gAIAQIBAT8AJJ/YpJoYhl5FUepqbjlhH0cuf9RVrxWe5mUJZsEJ3YnmyTRR+ORV9zT8Rtl6Pq9qn47datENp7Z3/qkj47crqaURg9iMVFwYdZ5y59ABSWVtH4Yh7nelUDktJGvidRT30C9CW9quOKXW4hhT3Y1PecTbx3SKPIHFM5J+oRufcmrDgpkUSXEaoD0Qdagtbe3XEUSrypZo4lyx9hVxxi7Gfh2wUfyc1PxW/lJBnIHku1fFycvqJ8waV0PS5kX3rQrdb3+6+BaDdrnPtXB+HWpxchScH6CeWTir7iM5uZQMYDECpJZZT9TE0YCi6pNs9B3NARgZbJPYCo4HlJIAVe5PQUsdhF45C59KS5stSqkPU46VEgjjRAMADlvV7w1zdO2cIxzTm3tBhBqetM9w5OCxqWCOAfW2p/4iizEAZ2qOGSU4RSat+HOsiO7gYYHFDlkVeRGSEhetfKW2cyH7CppSiEQgKBSW8sgLtsvdjUUAmm0rnSOpp54LVQijf+IqW/uewCiuF3XzNlE5P1AaW9xzGFXVkfiF1ICmpDbwo22tsfaoppJmbV07CmKRR6EA1HxGjBuSrEE9zQsp3fC7+tcIkhtW+WLjU/8AfNuIRLGUNXKIiuoyTVoDlsUIpDvp+5plVfzZNfEcDSDgelRWzLdLNI2gKQR51DIssauOhHMauKR6FMgAweu1Wssn1DIH2pwx3aQH75/wsmjwqM+dTO73I1MTuK4PcZDQn3HMNSRB1KkbGpLa3EjLgAjrg4owwr+oR96LWi9ZaNxYD+Zp5rczgpF36k1DOY5VcYGD2qNxIisOhHMauIW4P4oG/esCjHA3WM/Y0be27I3/AHTgmT4aqBUVjdZySUXzrhd5EGFtqJIG3NkQMCD0NSxrHK6MG2Nfgf71qtx+mx9zXzWmfCRqu/Wnkd+rE1aJJ8ZWXbB61E4dARzMVxWIDRLj0NaEbo2D5GtBXxpkeYr5eJp9SzL16HY06aD4gfatc7LgE4rhVyUlMTHZubdRiWB19KYFSQaSSRfCaM8bzYeIZz1G1FYT4ZMehFFSDgEGo4Z9QZRgjoat3Lwox6439+YRkEVdW+rJHiFHKnfY0qLLLscOO3nTKynDAitIPRh96MjpnTJXAZpJbV9Zzh9jzZriQTS4bbUaeR38RzW4m9QajnjkASUD3p7IHdHpbE/mYVw6ERWwAGATzJ5BHEx79qOWJpIRLHlfEKfWsmHSjUEtxnSgLelWts7ANKuPSgAAAOUzKoyxAFPxGDUEQ6z6dKvLksCDux6CkhmY/Shq2s7pXzpAHcGjYhvFil4VbZzoqO3jjGygchp4l6uKa9T8qMf/ACnvrg7Rw1jiUoOqUJ7UtlKylZZSwNQ2EMW4BzS2yA50ihGBQUckmpLdpJS/xGA8qW3Qds0IV8qEYrSKwP2BT/w//8QANBEAAgEDAgQFAgQFBQAAAAAAAQIDAAQREiEFMUFxEzAyUWEGIhRCUoEjQ1CRsRAVIECh/9oACAEDAQE/AFUD+hS3EEIzJKiD5OKn+pOGRel2kPsgqy43cXk6rHYOIid3Y+bLcQRDMkqJ3IFScXskB0ya+1XP1Nea9FvY79Cfu/xUcX1LeIGaYQg/lI01D9PLnVc3LSN8KBUXDrOL0QL3O9KoXyXmiT1yKO5qTilonJi3arrjd7uLeCMD3Y1c8Q4w5PiXkaD2B008jFvuEUjdyTXDPp0zKst3Esankgzqq2srW1XEMKp8gb+VPcxQJqc9gOZq6+oL0avBtVUfqdqueN8UmJDXJA9k2FeNqOZCxPuG3pXjPK6kXuK8NGG9/wD5r8NZDd7rPYV9P8Js2C3YQsAfsLf58tmwK4lxW5a7mAxgMQKlmmlP3MT8UbcooeTbPIdTSiIDLZJ6KKit3mJIAVepPIUsXDofXIXPxyqO7sNSqkHMgchUESxQxxqMBVA8uSuI8JkN7I2cIxyDUhtbMYRQ0nzWie5kJwWJqW2it1/iNqfoo6d6LMQBk4HIVHBLKcIpNWvC3SWN3cDSwOO1A5APlsKv4TLAyr6hX4G0zqlbf2FXEpjjIgAUAUlrNKDI+y9WNQWwnm0pnQOZqSe2tFCKN/0ipeI3XQBBXBbz8Xw6CQnLAaW7jzHFX1gfFLqQFapTbwRvt4jAftUE8k7Nq5dAOVMY4Y/DQDUfUwprbclWIJ6nehYXMj4UZ9zXAZYLOT8IZPuk3HfzCKuoBPEyGrxI40kQZLAHJqxBy+KEMjb6T3NMqr+YE/FeI4XSDgewqK2dL1J5G0BWBHvUEqzRJIvIjzHFcah8NTKoG4wdqs5pPuGoDsKkDYy0oP75/wBFk0elRn3qeSR7wamJ3FcBushoGPLdfMIqaFXRlYZBFS2lsJXQgBgd8HFGGBP5pHc0Xsl5yg0bvho/Waee2NwDHCOfMmre5aGdJFwMHpUUiyxq68iPMauK2oP8ZRvyaiB1FGG2b1Rn9jRtLTor/wB6kUtKYkUCoeHXhOWJRfeuC38If8HrJIGVPmEVLGGBUjY1PEkUzxsGGDWLfrrrVbD+Wx7mvxZW6wkSLvzxk08sj+pias1k8dHTbSedQyrLGGB7+ZiuNwAGOYLno1aEf0tg+xrwym0kZK+4o20LXOpJ158m2NOmg+pT2rxLhl2JxXBLzw5zC52bl382+hE1rKnxkU6lWIPMUksielqM8T3GJIRnPqXY0UgPpkI+GFMpBwCD2NRwXGoMq4I3Bq0lMtvE55ld+/mMMgiru21ElfUKbKnfY0saTT/aQJAeXQ0ylDhgRWlTycfvRkkjB0ydOlfTE8s1nL4hJxJsfNuLmUTzaXONZp5JHP3HNbrcZ5EGo7iOUBJgM+9PYA7o/wDehw9vzOMfFcItxBaAAYBPmXUwhhZuuMCjliaSATRZU4Ycx71JrWXEidj1omreW6yFjBb4qyspHAaddPxQAAAHlM6oMswA9zUnFrYOEjPiN8cqv7xnBBOWIwB7Ckt7hvRGxq04feq+rSAOoJr/AG0P6yDScFtA2dFQ2sUQwqAf88gU9zAnOQU/EYh6Udv/ACn4ldttFb1ji8wOqYR/ApeHSuhWaYuDUHC7eLcKSaWziByEFCECggFYHkE4qW0aaYuZWA/TSWca9M0IF/SKEQoIKwP6AjE7f9P/xAA1EAABAwIEBAUCBAYDAAAAAAABAAIDBBEFEjFBECAhQBMwMkJhIlEzUIGRBhQjJGBxNFJi/9oACAEBAAE/AqKgfUG56M+6ihjhZlYLD8kAAFgOn+D3V/yC4Tp42+5Orm7BOrJDopau3qesMkklc53tHeXCdURt9ydXN2CdWPOifOfc9ProG73T8TPtYv5irmPQ/sqTDHPIdJ1UUYjaAB3FwnVEY9ydWs2TqyQ6dE6R7tXJ8jGepykxGMekXUlfO7Q2Rc52pTWOcegVLhUknVyp8Oii2QaB2twE6oib7k6ubsE6skPwjI92ruMtTFFqev2UuISO9H0hFznanjS4dLMdOipcMiiGiDQNOzzBOnjb7k6tbsnVkh0TpHu1PLoqmuPpj/dEk8Y4nyOs0KhwgCznpkTWCwHY5gE6pib7k6vbsE6slPwjI92rvJrqq58Np6b8lLSSVD7AdPuqPD44Gjp2LpA1S12zP3TpJHau8ysn8KPpqeSio31MlhpuVS0scDAAOxlmDQpakyuIGnnV0mec/HTjBC6aVrG7qipGU8QaB2BcnvVfUHRU/wCGPNc6zSfhE3JPHA6LJH4zh1dp/rsCUVMfpVZqqR147ebP+C//AFxo4DUVDI/nqo2BjQBt554zDoqtip35JLffzXC4IThZxHzw/h6n9cxHwOzeOiq4lI2xVJIJI/kLw1kPl1rMs7vnrww6DwaSJvx17MqeO4VTFYqCQxS/CBuOL2i3C3PiMd2B/wBlQxeLVRM/9IDp2jh0VVEpmWKoZszcp1HF/p45QjGsh5Hszsc37rAoP715PsHbTMuFVRJjjFICmODmg8H+nnyNXhoghYbGxr5XDV3bEKpiU8diqGb2Hg/0+TJsqR1pe3lZcKqi1XWN4IUMgkYCn6eTJsozZwUD8ze2KqIrhVEdiqKXI/IU/wBKHkSbJnqVO+zu3kbcKqhTwWuuoZvEi+fJk2TPUgbFQuzN7YqojuFUx2Kp35H22PDqs5QkWcK/GTZM9XCnfY9u9twqqJStsVTS522WRZTxus5XiFOddM14NNionZm9vPHcKqison+HIEDcccgXhrwysp43KzuVJP1se3cLhVUSmZYqimzNynbnk1TBdeGvDKGZpuqaXOzt5mXCqokxxjkBTHZmg80mqj15IH5Xdu4KqiU7bEqkdeID7c0mqj15AoJMw7ep0VUfqVO/I8c0mqj15Yn5XJpuL9oUVWO+lSG8nCF+ZgPK/VR681NJt2ZRRVc/oUOrieFI71Dlfqo9eaN2Vya7M0Hsiinnoq+TVN4UzrS8r1HzbKkfmj7Ioqd1mqsfd/Fhs9p+eV6ZzbKhf9duxKKKrZLNUj80vJGbsafjkcmc2ypPx29iUU91gsQn1TfVyU/4TeRyZz0QvN2JRKq5srSqiTO9N15Iekbf9cjk3m2WHM6Of9+wKJUsgaFW1Wd1gnJuvFgzOAQ5Cm8t0CZpBGz9SomBjA0dgSpJAFXV2YljDwcm68aSP3n9OUpvI+ojZumePVOs0WaqOjbA357BzlNUNYCSbBVmIulu1nRvEocIaU6v/bmKzsG6NTEN06s/6hf3MqpcKLur1DTsiHQdhJKGqrxWNlw36ip6mWY3eeQRvdo1R0Z9xTImM0HC6MjBujUsCNX9gjPMdF/Wcm0sjlFhkjtlDhIGqipIo9B2DntaLkqrxmFnRn1FVFfPPqbD7BAOOyFPKfahRu3KFIzclCOJuwRlYN0aliNUdgvFmKySuTaSQpmHPOyZhRTMLamYfEE2njb7VYdhLURRC7nAKfFzpDGT8lTGsqD/AFJen2Qo2blCKFuwXixNRqWo1Ltgs8zl4Urk2ieUzDXnZMwopmGMCbQxDZCBg2WQK3ZOeGqrxMiTw2n9U+qBNy66NUNgv5iQ6BXmchBK5NoXnZMwx52TMKTMNYE2jiGyELBssoVu2c5Vcj7WCdTve66bQPOyZhbvsmYWmYdGE2liGyETRssqt3eVGBpQp4xshG0bK3+DUWJaMm/R35NRf8Zn5J//xAAoEAACAQQBAwQCAwEAAAAAAAAAAREQITFBQCBRYTBQcYGRoWCxwdH/2gAIAQEAAT8hTp9/d8Cguj2RaQSYS/g8O4keH7A1ZZlkFczNMQxf1lxyxTt8xqyzJII5GY5BnRfZPZ/B/o2WBqTE9PyF1klyGrLMmglg2awMkCSVr5JdPf8ACMCL4HkvfyRJzHiRYUKyRBCXEkeYzOIL52Y8ZwPssfqsyTST+wcS5vzRKRObZBam4XwnCkaMsyyCeDZrCMikEIsWG0jbdh5t9tlhLcuqk+2RpliskuC8hmaQ3tmNgZ4L0knogY+yZd+he8oN9O4klwFTbZcaA9lz6pJJJJJLa2tDc1TkWgkvwG0h6cjELf2SifRgikZTtaqvO7GnVd9+ApFhshNGZnf0pJJPFzDnm3PFFRIGGbc+MVwT6M7PfVZsP8Ai6EkLgGMkcvMu7ARNY6oonvyaPH7LhObGMkEkj/jE5PyD7GM4jRPSqyY9awJS4ERN7/k+AxjQhIExYSntkWhrZJZiMkhElqiJJrD29/s8nIISJcBjGMnEqdiULpVMhIsIn0I0xrIa1VTjQZ3B4TGMaJQjbsJL3uLTtEmYQsLohMbND7WZ08uXw2MZMiZOxIF5v+KyyLHXiGqE5U8JjGhkgdsToJiS0VkWPQpkuIDGNCSiYsSliUZZ4GGSE+txiLNw2MaGShmsQBlMSj8hZQn6FiIhkLfHDY0MQlCULuBXE02JJ3EJoke+ixUtrfDYxjpE82GhEtlEu5Bqk0JOxbyzHtEyEZGeOGxjGiQJTsMe03cUhqkJ6G3Q00xjDqqVsSt8QzGMdMlTsShcK9S6MAl3JHTICHRXRBTlcNjGNEoRt2Et73EINrqwD3E1iEJyp4bGMkQhp053wEkkk0wGbokrikrhsYxkE5LHyeAOz6sBmrJIxAlfDOpAx+bEzudhiZNXsIS6plLijkQNRv7mskmIyUnouwpBtcF1IGpMaRHlR05Ia7JJ6HkRi7cF0MSJZvIiTxwJ6MkZsnpbuIfPwWGGJZTQJJJPPlUmaMnWavIbgjDCGMxpGmdJJGKSSTIyE+iR4ZC+FwGNSXfD5tGMkkkSGJrkZkiZNW7j5otwGpPLbHPdbZmqEkj1+2WJLtREj3MqSJklhdjn6EY3EvXbpoXc+8BkmS6CGxUn0UkkpCzZkI93C1Vdl8BSFd0DJnyd+jmKXZDEYgoShUmiYyNxTvoa7CpYUwNkaakcBE7k+/hwj6GVrob3DJg8I/vkkaLZlFPJUHCoI3s7kZRyOZQKESSx670gkS7vgHzFMIzO1vk1VC+QYstUEMXoV4Is5s0LNtN1C2TQmKQSsL15GAY3P02RgF2MCudn+mDxGvo1kMg+8FkSaN0zuIylJY9RJ0QI4Ky7HtNJK4vZKAZDzjISbtTPeMtTeIUStECOLZHmF0ZOTfx0LWTJo1swSCRaIctyMujWTAIJUR7BHsskrx/0E01Kfsv6Psn/xAAoEAEBAQABAwMFAQADAQEAAAABABEhEDFBMFFxIEBhgZGhULHB0fH/2gAIAQEAAT8QG4T+X8b/AHmgvuv059Oevnph+UAYAfeZ/wAVpImoLsY/D9nnXPRUInQIxfiFpkuyAZkr+0jQoHDPpz7VQjdAv+q/M6luuEbM4X5xOgfsnZ+hHssduyYMJkPNkComAGH26xuiXB34unRDCir/ABs0+ZuZH3DMbp7CNvB+6WDMX2klkS1hFhgfaIjuE+WE5XxzcQzaxkW1v/c4uqs90em/hyR8T+lUt3lb0RACr0hbQzaTCB9kgi9A+WMrx1oeGXtf+NnXd+gDqANVs1Hb5H4lDkdVdXq/RQ0ydEPrPR4IrRPlu6L4g6fMWsMJjW/u5OqtratWvTG1eIdl5fQiYLWeF81C4GH2AcQDlZ3VeNSr8G2+X6dXwse0Cx0uubf8J5ZEq6rq9WeDUK5hAHpH0i6slCBJxHx/KI3bEdMeobFBYXJp1xNqY+DywHNPyF9gLx3kGM2X8tyeowWw29ACyW7U233n8JxNXX76mn/U0DPWXJexKb4/QEOZy4guI66hD9P5ND0GXRP4HvAHFD8Hrrrp8KQfLkXKYglwl2InBbv0EAkL2/uEzX/yHoOe1Rn2EwtcsDyaJwrSDE7UN5kPjS33o6d2OoDpoRUfwx/ZMANVwsnjL832CI9DQj4s6SaGxcE32g0iJ3AZDkYLJ9V0GXC09cgc4fCN4bf8ESGAAHqnUQhCFiJsYeW77YhiJByMue3tPcmT4rxWyvFHU6+FLLvavyx650EYdIuJKkmhwGIlugPQoXJ8z/hbD0e4BvbXxLuziZnK7Cfj7JOIQhGxDcxcnJku5Ph83a+Ihh6Ft/sg0e8RDsn2Rj0hFTNRF1I0gvc5nznw+Z8I6bD02GkTvg5IBN5OT4fsk2EekaEUTVPBYNSO15uA+IYjoQhNnRmJvH/jDp9kY9IRcS2GQ1qai13sAn+yLCMthjodbIT4YO4IP56L6LDpC0Eg4M7cl3eSwBLtzvPD0HzGXahEDDmZ71xZ3E7fp+t6PpCMIQJZmRXhiOkCXxs98DPdTt3IEI7XYlG7BvFZkAywJ3kP8MPK1B9T0fTMY9IuJIsngLCO9ognTyg9CK7hD7Yz3kwO9t2B3vCyy4+PiETT630xCEIEImxi55t2UMMoeuDI8RV7Jbwz2SM0cJo3s5fZmEOgXEkSREsOEVPTSNjY2Ngsfog/R0b0cTy8RkOyfZJCMIHJHyGBvPFjEFChe8Mv4S/jbDElA4jpKF59vZ9M9Awj06t9omPmc7cuG2GGLX6L/BDDHQ5mwU/TCryegekkZSh+LfoUyFyJwP2HQBEKX8Sf6EJDEdOf+f8A37NSsBsxvQAZn9QhhiFQ/BD+HQgwwzhvi7CQPoHpFKB9sjYZvy8w2VezTeYYYZ/yv4UKBCQxt/kgUeR9lXQFu+LY33nAOhxPBAQSGGG5fFL+UQYbYZ/0TM+y+0KL2JN39BY6BB9iOmxF/KY/B0GIJaT/AIWQ/Z0hnxBwRyXdW2IR/wBMdMj4yx/EL0NhiLfitl+b0D0Fh0wBhz2Tbfc59IDLdwRBhnwly+I6EgkZEJ+JFpxh8T7DK7l43FwbzynHbjoCBqJEM7AIZRNhPlDHQlwFUC7qJxdoP7Bnr4EU5oMJvxAc6VXXrDbZS85Mgw3J07iXLEIk1ckGj2C3ATzQ5pyP3fX2BdYqYd1nadh87rbd50woCr2CR4nceT8wEAAYFsQegZNSGqX93bP0WlPLwq1sfmIOwgz1m348EoD7apO1N4eB02GEjfzmEhBn5GA4t93L0d2B0dduWPyV3Qirm0zRyIwwCFpCTzG4A9cYaOVcInP/ABQ527Ur/OFu2se/CVj78HNzf+bA8P8ALywWdrwWjhiOK8yJOK5q2TScRLAuVpYMqXgnroO7DTD3eba+8Rrnae/Od/w4M755WsRgfhD77eD7gjF35WzXsZXKxIsq5fFiiXbSQUA+xeoROktJ3e+x+63EYz5IlOVfNWwNicZCw02Hg6OO0EgLH2pi5t1JYJMwctg7ca4CDYmUZwrswiMPusaMpu12CjOBeAINh9+Gw/4Qc6P/AOCggImif8aZ95//2Q==" alt="Logo Academia Superação" /></div>
+          <div>
+            <div class="brand-kicker">ACADEMIA SUPERAÇÃO</div>
+            <h1>Caixa Superação</h1>
+            <p class="subtitle">Visual no estilo da academia com a logo da Superação, banco real, lançamentos com data e hora, filtros, histórico e exportação pra Excel.</p>
+          </div>
+        </div>
+        <div class="pill-row">
+          <span class="pill">Débito</span>
+          <span class="pill">Crédito</span>
+          <span class="pill">Pix</span>
+          <span class="pill">Espécie</span>
+          <span class="pill">Saídas</span>
+          <span class="pill">Excel</span>
+          <span class="pill">Banco real</span>
+        </div>
+      </section>
+
+      <aside class="config-card">
+        <h2 class="config-title">Painel do sistema</h2>
+
+        <div class="system-card">
+          <div class="system-row">
+            <strong>Status do banco</strong>
+            <button class="btn-primary" id="testConnectionBtn" type="button">Testar conexão</button>
+          </div>
+          <div id="statusBox" class="status warn" role="status" aria-live="polite">Pronto para testar a conexão</div>
+        </div>
+
+        <div class="admin-card">
+          <div class="admin-title">
+            <strong>Acesso protegido</strong>
+            <span class="admin-badge off" id="adminStatusBadge">Desconectado</span>
+          </div>
+          <p class="admin-note">Login <strong>administrador</strong> vê todas as unidades e pode editar/excluir. Login <strong>geral</strong> vê tudo sem editar/excluir. Logins das <strong>unidades</strong> veem somente a própria unidade.</p>
+          <div class="admin-grid">
+            <div class="field">
+              <label for="adminLogin">Login</label>
+              <input id="adminLogin" placeholder="Digite o login" autocomplete="off" />
+            </div>
+            <div class="field">
+              <label for="adminPassword">Senha</label>
+              <input id="adminPassword" type="password" placeholder="Digite a senha" autocomplete="off" />
+            </div>
+          </div>
+          <div class="actions" style="margin-top:12px;">
+            <button class="btn-secondary" id="unlockAdminBtn" type="button">Entrar no sistema</button>
+            <button class="btn-secondary" id="lockAdminBtn" type="button">Sair</button>
+          </div>
+        </div>
+
+        <div class="admin-card user-manager" id="userManager">
+          <div class="admin-title">
+            <strong>Usuários e unidades</strong>
+            <span class="admin-badge on">ADM</span>
+          </div>
+          <p class="admin-note">Crie usuários, defina senha e marque quais unidades cada login pode ver. Usuário comum não edita/exclui lançamentos.</p>
+
+          <form id="userForm">
+            <input type="hidden" id="userEditingId" />
+            <div class="admin-grid">
+              <div class="field">
+                <label for="userName">Nome</label>
+                <input id="userName" placeholder="Ex: UR-3 Caixa" autocomplete="off" />
+              </div>
+              <div class="field">
+                <label for="userLogin">Login</label>
+                <input id="userLogin" placeholder="Ex: UR3" autocomplete="off" />
+              </div>
+              <div class="field">
+                <label for="userPassword">Senha</label>
+                <input id="userPassword" type="password" placeholder="Senha nova" autocomplete="new-password" />
+              </div>
+              <div class="field">
+                <label for="userRole">Tipo</label>
+                <select id="userRole">
+                  <option value="user">Usuário</option>
+                  <option value="admin">Administrador</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-full" style="margin-top:10px;">
+              <label>Unidades liberadas</label>
+              <div class="unit-checks">
+                <label class="check-item"><input type="checkbox" class="userUnitCheck" value="UR-3" /> UR-3</label>
+                <label class="check-item"><input type="checkbox" class="userUnitCheck" value="UR-2" /> UR-2</label>
+                <label class="check-item"><input type="checkbox" class="userUnitCheck" value="JABOATAO" /> JABOATAO</label>
+                <label class="check-item"><input type="checkbox" class="userUnitCheck" value="IBURA DE BAIXO" /> IBURA DE BAIXO</label>
+              </div>
+              <div class="inline-note">Administrador vê todas as unidades. Para usuário comum, marque uma ou mais unidades.</div>
+            </div>
+
+            <label class="check-item" style="margin-top:10px;">
+              <input type="checkbox" id="userActive" checked /> Usuário ativo
+            </label>
+
+            <div class="actions" style="margin-top:12px;">
+              <button class="btn-primary" id="saveUserBtn" type="submit">Salvar usuário</button>
+              <button class="btn-secondary" id="cancelUserEditBtn" type="button" style="display:none;">Cancelar edição</button>
+              <button class="btn-secondary" id="refreshUsersBtn" type="button">Atualizar lista</button>
+            </div>
+          </form>
+
+          <div class="user-list" id="userList">
+            <div class="empty">Entre como administrador para gerenciar usuários.</div>
+          </div>
+        </div>
+
+      </aside>
+    </div>
+
+    <section class="grid-4">
+      <div class="card">
+        <div class="label">Entradas</div>
+        <div class="metric positive" id="metricEntradas">R$ 0,00</div>
+        <div class="small">Somatório das entradas filtradas</div>
+      </div>
+      <div class="card">
+        <div class="label">Saídas</div>
+        <div class="metric negative" id="metricSaidas">R$ 0,00</div>
+        <div class="small">Somatório das saídas filtradas</div>
+      </div>
+      <div class="card">
+        <div class="label">Saldo líquido</div>
+        <div class="metric" id="metricSaldo">R$ 0,00</div>
+        <div class="small">Entradas menos saídas</div>
+      </div>
+      <div class="card">
+        <div class="label">Espécie líquido</div>
+        <div class="metric" id="metricEspecie">R$ 0,00</div>
+        <div class="small">Entrada em espécie menos saída em espécie</div>
+      </div>
+    </section>
+
+    <section class="dual-grid">
+      <div class="card subpanel">
+        <h2 class="section-title">Totais por forma de pagamento</h2>
+        <div class="mini-grid">
+          <div class="mini-card">
+            <div class="mini-label">Débito</div>
+            <div class="mini-metric" id="metricFormaDebito">R$ 0,00</div>
+          </div>
+          <div class="mini-card">
+            <div class="mini-label">Crédito</div>
+            <div class="mini-metric" id="metricFormaCredito">R$ 0,00</div>
+          </div>
+          <div class="mini-card">
+            <div class="mini-label">Pix</div>
+            <div class="mini-metric" id="metricFormaPix">R$ 0,00</div>
+          </div>
+          <div class="mini-card">
+            <div class="mini-label">Espécie</div>
+            <div class="mini-metric" id="metricFormaEspecie">R$ 0,00</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card subpanel">
+        <h2 class="section-title">Distribuição de entradas</h2>
+        <div class="mini-grid">
+          <div class="mini-card">
+            <div class="mini-label">Débito</div>
+            <div class="mini-metric positive" id="metricEntradaDebito">R$ 0,00</div>
+          </div>
+          <div class="mini-card">
+            <div class="mini-label">Crédito</div>
+            <div class="mini-metric positive" id="metricEntradaCredito">R$ 0,00</div>
+          </div>
+          <div class="mini-card">
+            <div class="mini-label">Pix</div>
+            <div class="mini-metric positive" id="metricEntradaPix">R$ 0,00</div>
+          </div>
+          <div class="mini-card">
+            <div class="mini-label">Espécie</div>
+            <div class="mini-metric positive" id="metricEntradaEspecie">R$ 0,00</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="main-grid">
+      <div>
+        <div class="hero form-card">
+          <h2 id="formTitle">Novo lançamento</h2>
+          <form id="cashForm">
+            <div class="form-grid">
+              <div class="field">
+                <label for="data_movimento">Data</label>
+                <input type="date" id="data_movimento" required />
+              </div>
+
+              <div class="field">
+                <label for="hora_movimento">Hora</label>
+                <input type="time" id="hora_movimento" required />
+              </div>
+
+              <div class="field">
+                <label for="tipo">Tipo</label>
+                <select id="tipo" required>
+                  <option value="Entrada">Entrada</option>
+                  <option value="Saída">Saída</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="forma_pagamento">Forma</label>
+                <select id="forma_pagamento" required>
+                  <option value="Débito">Débito</option>
+                  <option value="Crédito">Crédito</option>
+                  <option value="Pix">Pix</option>
+                  <option value="Espécie">Espécie</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="valor">Valor</label>
+                <input type="text" id="valor" inputmode="decimal" placeholder="R$ 0,00" required />
+              </div>
+
+              <div class="field">
+                <label for="categoria">Categoria</label>
+                <input id="categoria" placeholder="Ex: Mensalidade, Retirada, Compra..." required />
+              </div>
+
+              <div class="field">
+                <label for="unidade">Unidade</label>
+                <select id="unidade" required>
+                  <option value="UR-3">UR-3</option>
+                  <option value="UR-2">UR-2</option>
+                  <option value="JABOATAO">JABOATAO</option>
+                  <option value="IBURA DE BAIXO">IBURA DE BAIXO</option>
+                </select>
+              </div>
+
+              <div class="field-full">
+                <label for="responsavel">Responsável</label>
+                <input id="responsavel" placeholder="Quem lançou" required />
+              </div>
+
+              <div class="field-full">
+                <label for="descricao">Descrição</label>
+                <input id="descricao" placeholder="Descrição rápida do lançamento" />
+              </div>
+
+              <div class="field-full">
+                <label for="observacao">Observação</label>
+                <textarea id="observacao" placeholder="Observação opcional"></textarea>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button type="submit" class="btn-primary" id="submitBtn">Salvar lançamento</button>
+              <button type="button" class="btn-secondary" id="cancelEditBtn" style="display:none;">Cancelar edição</button>
+            </div>
+          </form>
+
+          <div class="hint">
+            Dica: usa <strong>Entrada + Espécie</strong> para dinheiro que entrou no caixa físico e
+            <strong>Saída + Espécie</strong> para retirada, compra ou qualquer valor tirado do caixa. No valor, pode digitar 1000 que o sistema formata como R$ 1.000,00.
+          </div>
+        </div>
+
+        <div class="filters-card hero">
+          <h2>Filtros</h2>
+          <div class="form-grid">
+            <div class="field">
+              <label for="filterDataInicio">Data inicial</label>
+              <input type="date" id="filterDataInicio" />
+            </div>
+            <div class="field">
+              <label for="filterDataFim">Data final</label>
+              <input type="date" id="filterDataFim" />
+            </div>
+            <div class="field">
+              <label for="filterTipo">Tipo</label>
+              <select id="filterTipo">
+                <option value="">Todos</option>
+                <option value="Entrada">Entrada</option>
+                <option value="Saída">Saída</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="filterForma">Forma</label>
+              <select id="filterForma">
+                <option value="">Todas</option>
+                <option value="Débito">Débito</option>
+                <option value="Crédito">Crédito</option>
+                <option value="Pix">Pix</option>
+                <option value="Espécie">Espécie</option>
+              </select>
+            </div>
+            <div class="field-full">
+              <label for="filterUnidade">Unidade</label>
+              <select id="filterUnidade">
+                <option value="">Todas</option>
+                <option value="UR-3">UR-3</option>
+                <option value="UR-2">UR-2</option>
+                <option value="JABOATAO">JABOATAO</option>
+                <option value="IBURA DE BAIXO">IBURA DE BAIXO</option>
+              </select>
+            </div>
+            <div class="field-full">
+              <label for="filterBusca">Buscar no histórico</label>
+              <input id="filterBusca" placeholder="Categoria, responsável, descrição ou observação" />
+            </div>
+          </div>
+          <div class="actions compact">
+            <button class="btn-secondary" id="applyFiltersBtn" type="button">Aplicar filtros</button>
+            <button class="btn-secondary" id="todayFilterBtn" type="button">Hoje</button>
+            <button class="btn-secondary" id="resetFiltersBtn" type="button">Limpar filtros</button>
+            <button class="btn-secondary" id="refreshBtn" type="button">Atualizar dados</button>
+          </div>
+          <div class="filter-note">Os filtros principais agora são enviados ao banco; a busca refina o que já voltou dele.</div>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-head">
+          <div>
+            <h2>Histórico de lançamentos</h2>
+            <div class="small" id="resultsInfo" aria-live="polite">0 registros</div>
+          </div>
+          <div class="actions" style="margin-top:0;">
+            <button class="btn-secondary" id="printReportBtn" type="button">Imprimir relatório</button>
+            <button class="btn-secondary" id="exportExcelBtn" type="button">Exportar Excel (.xls)</button>
+            <button class="btn-secondary" id="exportCsvBtn" type="button">Exportar CSV</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Hora</th>
+                <th>Tipo</th>
+                <th>Forma</th>
+                <th>Categoria</th>
+                <th>Unidade</th>
+                <th>Responsável</th>
+                <th>Descrição</th>
+                <th>Valor</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr><td colspan="10" class="empty">Configura a conexão e carrega os dados.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="hint">
+          exporta direto pro Excel (.xls), além do CSV.
+        </div>
+      </div>
+    </section>
+    <footer class="app-footer">feito por Pietro</footer>
+  </div>
+
+  <script>
+    // =====================================================
+    // CONFIG DO SUPABASE
+    // Cole sua URL e sua ANON KEY abaixo.
+    // =====================================================
+    const CONFIG = {
+      supabaseUrl: '',
+      supabaseAnonKey: '',
+      tables: {
+        cashMovements: 'caixa_movimentos',
+        users: 'caixa_usuarios'
+      }
+    };
+
+    const TABLE_NAME = CONFIG.tables.cashMovements;
+    const USERS_TABLE = CONFIG.tables.users;
+    const ACCESS_USER_KEY = 'caixa_v2_access_user';
+    const UNITS = ['UR-3', 'UR-2', 'JABOATAO', 'IBURA DE BAIXO'];
+    const MOVEMENT_TYPES = ['Entrada', 'Saída'];
+    const PAYMENT_METHODS = ['Débito', 'Crédito', 'Pix', 'Espécie'];
+    const CASH_SELECT_FIELDS = 'id,data_movimento,hora_movimento,tipo,forma_pagamento,valor,categoria,unidade,responsavel,descricao,observacao,created_at';
+    const DATA_LIMIT = 1000;
+    let editingUserId = null;
+    let usersCache = [];
+    let editingId = null;
+    let currentRows = [];
+    let isLoadingData = false;
+    let isSavingMovement = false;
+    let isSavingUser = false;
+
+    function toFiniteNumber(value) {
+      const number = Number(value || 0);
+      return Number.isFinite(number) ? number : 0;
+    }
+
+    const formatBRL = (value) => toFiniteNumber(value).toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    });
+
+    function parseCurrencyToNumber(value) {
+      const raw = String(value ?? '').trim();
+      if (!raw) return 0;
+
+      const cleaned = raw
+        .replace(/R\$/g, '')
+        .replace(/\s/g, '')
+        .replace(/[^0-9.,-]/g, '');
+
+      if (!cleaned) return 0;
+
+      const hasComma = cleaned.includes(',');
+      const hasDot = cleaned.includes('.');
+
+      let normalized = cleaned;
+      if (hasComma) {
+        normalized = normalized.replace(/\./g, '').replace(',', '.');
+      } else if (hasDot) {
+        const parts = normalized.split('.');
+        const last = parts[parts.length - 1];
+        if (parts.length > 1 && last.length === 3) {
+          normalized = parts.join('');
+        }
+      }
+
+      const number = Number(normalized);
+      return Number.isFinite(number) ? number : 0;
+    }
+
+    function formatCurrencyInput() {
+      const value = parseCurrencyToNumber(els.valor.value);
+      els.valor.value = value > 0 ? formatBRL(value) : '';
+    }
+
+    function prepareCurrencyInputForTyping() {
+      const value = parseCurrencyToNumber(els.valor.value);
+      els.valor.value = value > 0 ? String(value).replace('.', ',') : '';
+      setTimeout(() => {
+        try {
+          els.valor.selectionStart = els.valor.selectionEnd = els.valor.value.length;
+        } catch {}
+      }, 0);
+    }
+
+    function getLocalDateInputValue(date = new Date()) {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function getLocalTimeInputValue(date = new Date()) {
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}`;
+    }
+
+    function isValidDateInput(value) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ''))) return false;
+      const [year, month, day] = String(value).split('-').map(Number);
+      const date = new Date(year, month - 1, day);
+      return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+    }
+
+    function isValidTimeInput(value) {
+      return /^([01]\d|2[0-3]):[0-5]\d$/.test(String(value || ''));
+    }
+
+    const els = {
+      statusBox: document.getElementById('statusBox'),
+      testConnectionBtn: document.getElementById('testConnectionBtn'),
+      adminStatusBadge: document.getElementById('adminStatusBadge'),
+      adminLogin: document.getElementById('adminLogin'),
+      adminPassword: document.getElementById('adminPassword'),
+      unlockAdminBtn: document.getElementById('unlockAdminBtn'),
+      lockAdminBtn: document.getElementById('lockAdminBtn'),
+      userManager: document.getElementById('userManager'),
+      userForm: document.getElementById('userForm'),
+      userEditingId: document.getElementById('userEditingId'),
+      userName: document.getElementById('userName'),
+      userLogin: document.getElementById('userLogin'),
+      userPassword: document.getElementById('userPassword'),
+      userRole: document.getElementById('userRole'),
+      userActive: document.getElementById('userActive'),
+      userList: document.getElementById('userList'),
+      saveUserBtn: document.getElementById('saveUserBtn'),
+      cancelUserEditBtn: document.getElementById('cancelUserEditBtn'),
+      refreshUsersBtn: document.getElementById('refreshUsersBtn'),
+      cashForm: document.getElementById('cashForm'),
+      formTitle: document.getElementById('formTitle'),
+      submitBtn: document.getElementById('submitBtn'),
+      cancelEditBtn: document.getElementById('cancelEditBtn'),
+      tableBody: document.getElementById('tableBody'),
+      resultsInfo: document.getElementById('resultsInfo'),
+      metricEntradas: document.getElementById('metricEntradas'),
+      metricSaidas: document.getElementById('metricSaidas'),
+      metricSaldo: document.getElementById('metricSaldo'),
+      metricEspecie: document.getElementById('metricEspecie'),
+      metricFormaDebito: document.getElementById('metricFormaDebito'),
+      metricFormaCredito: document.getElementById('metricFormaCredito'),
+      metricFormaPix: document.getElementById('metricFormaPix'),
+      metricFormaEspecie: document.getElementById('metricFormaEspecie'),
+      metricEntradaDebito: document.getElementById('metricEntradaDebito'),
+      metricEntradaCredito: document.getElementById('metricEntradaCredito'),
+      metricEntradaPix: document.getElementById('metricEntradaPix'),
+      metricEntradaEspecie: document.getElementById('metricEntradaEspecie'),
+      exportExcelBtn: document.getElementById('exportExcelBtn'),
+      exportCsvBtn: document.getElementById('exportCsvBtn'),
+      printReportBtn: document.getElementById('printReportBtn'),
+      refreshBtn: document.getElementById('refreshBtn'),
+      applyFiltersBtn: document.getElementById('applyFiltersBtn'),
+      todayFilterBtn: document.getElementById('todayFilterBtn'),
+      resetFiltersBtn: document.getElementById('resetFiltersBtn'),
+
+      data_movimento: document.getElementById('data_movimento'),
+      hora_movimento: document.getElementById('hora_movimento'),
+      tipo: document.getElementById('tipo'),
+      forma_pagamento: document.getElementById('forma_pagamento'),
+      valor: document.getElementById('valor'),
+      categoria: document.getElementById('categoria'),
+      unidade: document.getElementById('unidade'),
+      responsavel: document.getElementById('responsavel'),
+      descricao: document.getElementById('descricao'),
+      observacao: document.getElementById('observacao'),
+
+      filterDataInicio: document.getElementById('filterDataInicio'),
+      filterDataFim: document.getElementById('filterDataFim'),
+      filterTipo: document.getElementById('filterTipo'),
+      filterForma: document.getElementById('filterForma'),
+      filterUnidade: document.getElementById('filterUnidade'),
+      filterBusca: document.getElementById('filterBusca'),
+    };
+
+    els.data_movimento.value = getLocalDateInputValue();
+    els.hora_movimento.value = getLocalTimeInputValue();
+    els.unidade.value = 'UR-3';
+
+    function getConfig() {
+      const url = String(CONFIG.supabaseUrl || '').trim().replace(/\/$/, '');
+      const anonKey = String(CONFIG.supabaseAnonKey || '').trim();
+      if (!url || !anonKey) return null;
+      return { url, anonKey };
+    }
+
+    function setStatus(message, type = 'warn') {
+
+      els.statusBox.textContent = message;
+      els.statusBox.className = 'status ' + type;
+    }
+
+    function normalizeLogin(value) {
+      return String(value || '').trim().toLowerCase();
+    }
+
+    async function hashPassword(password) {
+      const text = String(password || '');
+      const data = new TextEncoder().encode(text);
+      const buffer = await crypto.subtle.digest('SHA-256', data);
+      return Array.from(new Uint8Array(buffer)).map(byte => byte.toString(16).padStart(2, '0')).join('');
+    }
+
+    function getAccessUser() {
+      const raw = sessionStorage.getItem(ACCESS_USER_KEY);
+      if (!raw) return null;
+      try {
+        const user = JSON.parse(raw);
+        const validRole = ['admin', 'user'].includes(user.role);
+        if (!user || !validRole || !user.login) return null;
+        user.allowed_units = Array.isArray(user.allowed_units) ? user.allowed_units.filter(unit => UNITS.includes(unit)) : [];
+        return user;
+      } catch {
+        return null;
+      }
+    }
+
+    function getAccessRole() {
+      return getAccessUser()?.role || '';
+    }
+
+    function hasSystemAccess() {
+      return ['user', 'admin'].includes(getAccessRole());
+    }
+
+    function hasAdminAccess() {
+      return getAccessRole() === 'admin';
+    }
+
+    function getAllowedUnits() {
+      const user = getAccessUser();
+      if (!user) return [];
+      if (user.role === 'admin') return [...UNITS];
+      return (user.allowed_units || []).filter(unit => UNITS.includes(unit));
+    }
+
+    function canAccessUnit(unit) {
+      return getAllowedUnits().includes(unit);
+    }
+
+    function getDefaultAllowedUnit() {
+      return getAllowedUnits()[0] || 'UR-3';
+    }
+
+    function getAccessUnit() {
+      const allowed = getAllowedUnits();
+      return allowed.length === 1 ? allowed[0] : '';
+    }
+
+    function getDefaultResponsible() {
+      return getAccessUser()?.nome || '';
+    }
+
+    function normalizeSearchText(value) {
+      return String(value || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toLowerCase()
+        .trim();
+    }
+
+    function matchesSearch(row, searchTerm) {
+      if (!searchTerm) return true;
+      return [
+        row.categoria,
+        row.responsavel,
+        row.descricao,
+        row.observacao,
+        row.unidade,
+        row.forma_pagamento,
+        row.tipo
+      ].some(value => normalizeSearchText(value).includes(searchTerm));
+    }
+
+    function syncExportButtons() {
+      const disabled = isLoadingData || !currentRows.length;
+      [els.printReportBtn, els.exportExcelBtn, els.exportCsvBtn].forEach(button => {
+        button.disabled = disabled;
+      });
+    }
+
+    function setDataLoading(isLoading) {
+      isLoadingData = isLoading;
+      [els.refreshBtn, els.applyFiltersBtn, els.todayFilterBtn, els.resetFiltersBtn].forEach(button => {
+        button.disabled = isLoading;
+      });
+      syncExportButtons();
+    }
+
+    function setSelectOptionsByPermission(selectEl, allowBlank = false) {
+      const allowed = getAllowedUnits();
+      Array.from(selectEl.options).forEach(option => {
+        if (option.value === '') {
+          option.disabled = !allowBlank || !hasSystemAccess();
+          return;
+        }
+        option.disabled = hasSystemAccess() ? !allowed.includes(option.value) : true;
+      });
+    }
+
+    function applyUnitLockToFields() {
+      const allowed = getAllowedUnits();
+      const logged = hasSystemAccess();
+      const oneUnitOnly = logged && allowed.length === 1;
+
+      setSelectOptionsByPermission(els.unidade, false);
+      setSelectOptionsByPermission(els.filterUnidade, true);
+
+      els.unidade.disabled = !logged || oneUnitOnly;
+      els.filterUnidade.disabled = !logged || oneUnitOnly;
+
+      if (!logged) {
+        els.unidade.value = 'UR-3';
+        els.filterUnidade.value = '';
+        return;
+      }
+
+      if (!allowed.includes(els.unidade.value)) {
+        els.unidade.value = getDefaultAllowedUnit();
+      }
+
+      if (oneUnitOnly) {
+        els.unidade.value = allowed[0];
+        els.filterUnidade.value = allowed[0];
+      } else if (els.filterUnidade.value && !allowed.includes(els.filterUnidade.value)) {
+        els.filterUnidade.value = '';
+      }
+    }
+
+    function updateAdminUI() {
+      const user = getAccessUser();
+      const role = user?.role || '';
+      const isLogged = Boolean(user);
+
+      if (role === 'admin') {
+        els.adminStatusBadge.textContent = 'Administrador';
+        els.adminStatusBadge.className = 'admin-badge on';
+      } else if (role === 'user') {
+        const units = getAllowedUnits();
+        els.adminStatusBadge.textContent = units.length === 1 ? units[0] : 'Usuário';
+        els.adminStatusBadge.className = 'admin-badge basic';
+      } else {
+        els.adminStatusBadge.textContent = 'Desconectado';
+        els.adminStatusBadge.className = 'admin-badge off';
+      }
+
+      applyUnitLockToFields();
+
+      els.adminPassword.type = 'password';
+      els.submitBtn.disabled = !hasSystemAccess();
+      els.submitBtn.textContent = editingId
+        ? (hasAdminAccess() ? 'Salvar alteração' : 'Faça login admin para editar')
+        : (hasSystemAccess() ? 'Salvar lançamento' : 'Faça login para lançar');
+
+      els.userManager.classList.toggle('open', hasAdminAccess());
+
+      if (!isLogged) {
+        els.adminLogin.value = '';
+        els.adminPassword.value = '';
+      } else if (!editingId && !els.responsavel.value.trim()) {
+        els.responsavel.value = getDefaultResponsible();
+      }
+      if (!hasAdminAccess() && editingId) {
+        resetForm();
+      }
+      if (!hasAdminAccess()) {
+        resetUserForm();
+        usersCache = [];
+        renderUsers([]);
+      }
+    }
+
+    async function fetchUserByLogin(login) {
+      const url = buildUrl('/rest/v1/' + USERS_TABLE, {
+        select: 'id,nome,login,login_normalizado,password_hash,role,allowed_units,active',
+        login_normalizado: 'eq.' + normalizeLogin(login),
+        limit: '1'
+      });
+      const res = await fetch(url, { headers: buildHeaders() });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || 'Erro ao buscar usuário');
+      }
+      const data = await res.json();
+      return Array.isArray(data) ? data[0] : null;
+    }
+
+    async function unlockAdmin() {
+      const login = normalizeLogin(els.adminLogin.value);
+      const senha = els.adminPassword.value;
+
+      if (!login || !senha) {
+        alert('Preenche login e senha.');
+        return;
+      }
+
+      try {
+        const user = await fetchUserByLogin(login);
+        if (!user || !user.active) {
+          alert('Login ou senha incorretos.');
+          return;
+        }
+
+        const senhaHash = await hashPassword(senha);
+        if (senhaHash !== user.password_hash) {
+          alert('Login ou senha incorretos.');
+          return;
+        }
+
+        sessionStorage.setItem(ACCESS_USER_KEY, JSON.stringify({
+          id: user.id,
+          login: user.login,
+          role: user.role,
+          nome: user.nome || user.login,
+          allowed_units: Array.isArray(user.allowed_units) ? user.allowed_units : []
+        }));
+        els.adminPassword.value = '';
+
+        updateAdminUI();
+        await loadData();
+        if (hasAdminAccess()) await loadUsers();
+
+        alert(user.role === 'admin'
+          ? 'Login administrador ativado. Você pode gerenciar usuários e editar/excluir lançamentos.'
+          : 'Login de usuário ativado. Você verá somente as unidades liberadas para esse login.');
+      } catch (error) {
+        console.error(error);
+        alert('Erro ao entrar no sistema.\n\n' + (error.message || error));
+      }
+    }
+
+    async function lockAdmin() {
+      sessionStorage.removeItem(ACCESS_USER_KEY);
+      updateAdminUI();
+      currentRows = [];
+      renderTable([]);
+      updateMetrics([]);
+      setStatus('Sessão encerrada. Faça login para visualizar os dados.', 'warn');
+      alert('Sessão encerrada.');
+    }
+
+    function getSelectedUserUnits() {
+      return Array.from(document.querySelectorAll('.userUnitCheck:checked')).map(item => item.value);
+    }
+
+    function setSelectedUserUnits(units) {
+      const set = new Set(Array.isArray(units) ? units : []);
+      document.querySelectorAll('.userUnitCheck').forEach(item => {
+        item.checked = set.has(item.value);
+      });
+    }
+
+    function resetUserForm() {
+      if (!els.userForm) return;
+      editingUserId = null;
+      els.userEditingId.value = '';
+      els.userForm.reset();
+      els.userRole.value = 'user';
+      els.userActive.checked = true;
+      els.userPassword.placeholder = 'Senha nova';
+      els.saveUserBtn.textContent = 'Salvar usuário';
+      els.cancelUserEditBtn.style.display = 'none';
+      setSelectedUserUnits([]);
+    }
+
+    async function loadUsers() {
+      if (!hasAdminAccess()) return;
+      try {
+        const url = buildUrl('/rest/v1/' + USERS_TABLE, {
+          select: 'id,nome,login,role,allowed_units,active,created_at',
+          order: 'created_at.asc'
+        });
+        const res = await fetch(url, { headers: buildHeaders() });
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(txt || 'Erro ao carregar usuários');
+        }
+        usersCache = await res.json();
+        renderUsers(usersCache);
+      } catch (error) {
+        console.error(error);
+        els.userList.innerHTML = '<div class="empty">Erro ao carregar usuários.</div>';
+      }
+    }
+
+    function renderUsers(users) {
+      if (!els.userList) return;
+      if (!hasAdminAccess()) {
+        els.userList.innerHTML = '<div class="empty">Entre como administrador para gerenciar usuários.</div>';
+        return;
+      }
+      if (!users.length) {
+        els.userList.innerHTML = '<div class="empty">Nenhum usuário cadastrado.</div>';
+        return;
+      }
+
+      const currentUser = getAccessUser();
+      els.userList.innerHTML = users.map(user => {
+        const units = user.role === 'admin'
+          ? 'Todas as unidades'
+          : (Array.isArray(user.allowed_units) && user.allowed_units.length ? user.allowed_units.join(', ') : 'Nenhuma unidade');
+        const status = user.active ? 'Ativo' : 'Inativo';
+        const role = user.role === 'admin' ? 'Administrador' : 'Usuário';
+        const self = currentUser?.id === user.id;
+        return `
+          <div class="user-item">
+            <div class="user-item-top">
+              <div>
+                <div class="user-name">${escapeHtml(user.nome || user.login)}</div>
+                <div class="user-meta">Login: ${escapeHtml(user.login)} • ${role} • ${status}</div>
+                <div class="user-meta">Unidades: ${escapeHtml(units)}</div>
+              </div>
+              <span class="admin-badge ${user.role === 'admin' ? 'on' : 'basic'}">${escapeHtml(role)}</span>
+            </div>
+            <div class="user-actions">
+              <button class="btn-secondary" type="button" onclick="editUser('${user.id}')">Editar</button>
+              <button class="btn-danger" type="button" onclick="deleteUser('${user.id}')" ${self ? 'disabled title="Você não pode excluir o usuário logado"' : ''}>Excluir</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    window.editUser = function(id) {
+      const user = usersCache.find(item => item.id === id);
+      if (!user) return;
+      editingUserId = id;
+      els.userEditingId.value = id;
+      els.userName.value = user.nome || '';
+      els.userLogin.value = user.login || '';
+      els.userPassword.value = '';
+      els.userPassword.placeholder = 'Deixe em branco para manter';
+      els.userRole.value = user.role || 'user';
+      els.userActive.checked = Boolean(user.active);
+      setSelectedUserUnits(user.allowed_units || []);
+      els.saveUserBtn.textContent = 'Salvar alteração';
+      els.cancelUserEditBtn.style.display = 'inline-block';
+    };
+
+    window.deleteUser = async function(id) {
+      if (!hasAdminAccess()) return;
+      const currentUser = getAccessUser();
+      if (currentUser?.id === id) {
+        alert('Você não pode excluir o usuário que está logado agora.');
+        return;
+      }
+      const user = usersCache.find(item => item.id === id);
+      const ok = confirm(`Excluir o usuário ${user?.login || ''}?`);
+      if (!ok) return;
+      try {
+        const url = buildUrl('/rest/v1/' + USERS_TABLE, { id: 'eq.' + id });
+        const res = await fetch(url, { method: 'DELETE', headers: buildHeaders() });
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(txt || 'Erro ao excluir usuário');
+        }
+        await loadUsers();
+        alert('Usuário excluído.');
+      } catch (error) {
+        console.error(error);
+        alert('Erro ao excluir usuário.\n\n' + (error.message || error));
+      }
+    };
+
+    async function saveUser(event) {
+      event.preventDefault();
+      if (!hasAdminAccess()) {
+        alert('Somente administrador pode gerenciar usuários.');
+        return;
+      }
+      if (isSavingUser) return;
+
+      const wasEditingUser = Boolean(editingUserId);
+      const currentUser = getAccessUser();
+      const editingSelf = Boolean(editingUserId && currentUser?.id === editingUserId);
+      const nome = els.userName.value.trim();
+      const login = els.userLogin.value.trim();
+      const loginNormalizado = normalizeLogin(login);
+      const senha = els.userPassword.value;
+      const role = els.userRole.value;
+      const active = Boolean(els.userActive.checked);
+      const allowed_units = role === 'admin' ? [...UNITS] : getSelectedUserUnits();
+
+      if (!nome) return alert('Preenche o nome do usuário.');
+      if (!login) return alert('Preenche o login do usuário.');
+      if (!['admin', 'user'].includes(role)) return alert('Perfil inválido.');
+      if (!editingUserId && !senha) return alert('Preenche a senha do novo usuário.');
+      if (role !== 'admin' && !allowed_units.length) return alert('Marca pelo menos uma unidade para esse usuário.');
+      if (editingSelf && role !== 'admin') return alert('Você não pode tirar o próprio acesso de administrador.');
+      if (editingSelf && !active) return alert('Você não pode desativar o usuário que está logado agora.');
+
+      try {
+        isSavingUser = true;
+        els.saveUserBtn.disabled = true;
+        els.saveUserBtn.textContent = wasEditingUser ? 'Salvando alteração...' : 'Criando usuário...';
+
+        const existingUser = await fetchUserByLogin(login);
+        if (existingUser && existingUser.id !== editingUserId) {
+          alert('Já existe um usuário com esse login.');
+          return;
+        }
+
+        const payload = {
+          nome,
+          login,
+          login_normalizado: loginNormalizado,
+          role,
+          allowed_units,
+          active
+        };
+        if (senha) payload.password_hash = await hashPassword(senha);
+
+        const method = editingUserId ? 'PATCH' : 'POST';
+        const url = editingUserId
+          ? buildUrl('/rest/v1/' + USERS_TABLE, { id: 'eq.' + editingUserId })
+          : buildUrl('/rest/v1/' + USERS_TABLE);
+        const res = await fetch(url, {
+          method,
+          headers: buildHeaders(),
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(txt || 'Erro ao salvar usuário');
+        }
+        if (editingSelf) {
+          sessionStorage.setItem(ACCESS_USER_KEY, JSON.stringify({
+            id: currentUser.id,
+            login,
+            role,
+            nome,
+            allowed_units
+          }));
+          updateAdminUI();
+        }
+        resetUserForm();
+        await loadUsers();
+        alert(wasEditingUser ? 'Usuário atualizado.' : 'Usuário criado.');
+      } catch (error) {
+        console.error(error);
+        alert('Erro ao salvar usuário.\n\n' + (error.message || error));
+      } finally {
+        isSavingUser = false;
+        els.saveUserBtn.disabled = false;
+        els.saveUserBtn.textContent = editingUserId ? 'Salvar alteração' : 'Salvar usuário';
+      }
+    }
+
+    function buildHeaders() {
+
+      const config = getConfig();
+      if (!config) throw new Error('Configuração do Supabase não encontrada. Preenche a const CONFIG no código.');
+      return {
+        apikey: config.anonKey,
+        Authorization: 'Bearer ' + config.anonKey,
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation'
+      };
+    }
+
+    function buildUrl(path, params = {}) {
+      const config = getConfig();
+      if (!config) throw new Error('Configuração do Supabase não encontrada. Preenche a const CONFIG no código.');
+      const url = new URL(config.url + path);
+      Object.entries(params).forEach(([key, value]) => {
+        const values = Array.isArray(value) ? value : [value];
+        values.forEach(item => {
+          if (item !== '' && item !== null && item !== undefined) {
+            url.searchParams.append(key, item);
+          }
+        });
+      });
+      return url.toString();
+    }
+
+    async function testConnection() {
+      try {
+        setStatus('Testando conexão...', 'warn');
+        const url = buildUrl('/rest/v1/' + TABLE_NAME, { select: 'id', limit: '1' });
+        const res = await fetch(url, { headers: buildHeaders() });
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(txt || 'Falha ao conectar');
+        }
+        setStatus('Conexão OK com o banco', 'ok');
+      } catch (error) {
+        console.error(error);
+        setStatus('Erro na conexão: confere SQL, URL e chave', 'warn');
+        alert('Falha ao testar conexão.\n\n' + (error.message || error));
+      }
+    }
+
+    function getFilters() {
+      return {
+        dataInicio: els.filterDataInicio.value,
+        dataFim: els.filterDataFim.value,
+        tipo: els.filterTipo.value,
+        forma: els.filterForma.value,
+        unidade: els.filterUnidade.value.trim(),
+        busca: normalizeSearchText(els.filterBusca.value)
+      };
+    }
+
+    function validateFilters(filters) {
+      if (filters.dataInicio && !isValidDateInput(filters.dataInicio)) return 'Data inicial inválida.';
+      if (filters.dataFim && !isValidDateInput(filters.dataFim)) return 'Data final inválida.';
+      if (filters.dataInicio && filters.dataFim && filters.dataInicio > filters.dataFim) {
+        return 'A data inicial não pode ser maior que a data final.';
+      }
+      return null;
+    }
+
+    function formatPostgrestListValue(value) {
+      return `"${String(value).replaceAll('"', '""')}"`;
+    }
+
+    function buildCashQueryParams(filters, allowedUnits) {
+      const params = {
+        select: CASH_SELECT_FIELDS,
+        order: 'data_movimento.desc,hora_movimento.desc,created_at.desc',
+        limit: String(DATA_LIMIT)
+      };
+
+      const dateFilters = [];
+      if (filters.dataInicio) dateFilters.push('gte.' + filters.dataInicio);
+      if (filters.dataFim) dateFilters.push('lte.' + filters.dataFim);
+      if (dateFilters.length) params.data_movimento = dateFilters;
+
+      if (filters.tipo) params.tipo = 'eq.' + filters.tipo;
+      if (filters.forma) params.forma_pagamento = 'eq.' + filters.forma;
+
+      if (filters.unidade) {
+        params.unidade = 'eq.' + filters.unidade;
+      } else if (allowedUnits.length === 1) {
+        params.unidade = 'eq.' + allowedUnits[0];
+      } else if (allowedUnits.length && allowedUnits.length < UNITS.length) {
+        params.unidade = 'in.(' + allowedUnits.map(formatPostgrestListValue).join(',') + ')';
+      }
+
+      return params;
+    }
+
+    function applyClientFilters(rows, filters, allowedUnits) {
+      return (Array.isArray(rows) ? rows : []).filter(row => {
+        const data = row.data_movimento || '';
+        if (!allowedUnits.includes(row.unidade)) return false;
+        if (filters.dataInicio && data < filters.dataInicio) return false;
+        if (filters.dataFim && data > filters.dataFim) return false;
+        if (filters.tipo && row.tipo !== filters.tipo) return false;
+        if (filters.forma && row.forma_pagamento !== filters.forma) return false;
+        if (filters.unidade && row.unidade !== filters.unidade) return false;
+        if (!matchesSearch(row, filters.busca)) return false;
+        return true;
+      });
+    }
+
+
+    async function loadData() {
+      if (!hasSystemAccess()) {
+        currentRows = [];
+        renderTable([]);
+        updateMetrics([]);
+        setStatus('Faça login para visualizar os dados', 'warn');
+        return;
+      }
+
+      applyUnitLockToFields();
+      const filters = getFilters();
+      const filterError = validateFilters(filters);
+      if (filterError) {
+        alert(filterError);
+        return;
+      }
+
+      const config = getConfig();
+      if (!config) {
+        renderTable([]);
+        updateMetrics([]);
+        setStatus('Preenche a CONFIG no código para conectar o banco', 'warn');
+        return;
+      }
+
+      try {
+        setDataLoading(true);
+        setStatus('Carregando dados...', 'warn');
+        const allowedUnits = getAllowedUnits();
+        if (!allowedUnits.length) {
+          currentRows = [];
+          renderTable([]);
+          updateMetrics([]);
+          setStatus('Esse login ainda não tem nenhuma unidade liberada.', 'warn');
+          return;
+        }
+        if (filters.unidade && !allowedUnits.includes(filters.unidade)) {
+          currentRows = [];
+          renderTable([]);
+          updateMetrics([]);
+          setStatus('Esse login não pode consultar a unidade selecionada.', 'warn');
+          return;
+        }
+        const params = buildCashQueryParams(filters, allowedUnits);
+
+        const url = buildUrl('/rest/v1/' + TABLE_NAME, params);
+        const res = await fetch(url, { headers: buildHeaders() });
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(txt || 'Falha ao carregar lançamentos');
+        }
+
+        const rows = await res.json();
+        currentRows = applyClientFilters(rows, filters, allowedUnits);
+
+        renderTable(currentRows);
+        updateMetrics(currentRows);
+        setStatus(
+          Array.isArray(rows) && rows.length >= DATA_LIMIT
+            ? `Mostrando até ${DATA_LIMIT} registros. Usa mais filtros para fechar o recorte.`
+            : 'Dados atualizados com sucesso',
+          Array.isArray(rows) && rows.length >= DATA_LIMIT ? 'info' : 'ok'
+        );
+      } catch (error) {
+        console.error(error);
+        setStatus('Erro ao carregar dados', 'warn');
+        currentRows = [];
+        renderTable([]);
+        updateMetrics([]);
+        alert('Não consegui carregar os dados.\n\n' + (error.message || error));
+      } finally {
+        setDataLoading(false);
+      }
+    }
+
+    function updateMetrics(rows) {
+      const entradas = rows
+        .filter(row => row.tipo === 'Entrada')
+        .reduce((sum, row) => sum + toFiniteNumber(row.valor), 0);
+
+      const saidas = rows
+        .filter(row => row.tipo === 'Saída')
+        .reduce((sum, row) => sum + toFiniteNumber(row.valor), 0);
+
+      const totalByForma = forma => {
+        const entradasForma = rows
+          .filter(row => row.tipo === 'Entrada' && row.forma_pagamento === forma)
+          .reduce((sum, row) => sum + toFiniteNumber(row.valor), 0);
+
+        const saidasForma = rows
+          .filter(row => row.tipo === 'Saída' && row.forma_pagamento === forma)
+          .reduce((sum, row) => sum + toFiniteNumber(row.valor), 0);
+
+        return {
+          entradas: entradasForma,
+          saidas: saidasForma,
+          liquido: entradasForma - saidasForma
+        };
+      };
+
+      const debito = totalByForma('Débito');
+      const credito = totalByForma('Crédito');
+      const pix = totalByForma('Pix');
+      const especieData = totalByForma('Espécie');
+
+      const saldo = entradas - saidas;
+      const especie = especieData.liquido;
+
+      els.metricEntradas.textContent = formatBRL(entradas);
+      els.metricSaidas.textContent = formatBRL(saidas);
+      els.metricSaldo.textContent = formatBRL(saldo);
+      els.metricEspecie.textContent = formatBRL(especie);
+
+      els.metricFormaDebito.textContent = formatBRL(debito.liquido);
+      els.metricFormaCredito.textContent = formatBRL(credito.liquido);
+      els.metricFormaPix.textContent = formatBRL(pix.liquido);
+      els.metricFormaEspecie.textContent = formatBRL(especieData.liquido);
+
+      els.metricEntradaDebito.textContent = formatBRL(debito.entradas);
+      els.metricEntradaCredito.textContent = formatBRL(credito.entradas);
+      els.metricEntradaPix.textContent = formatBRL(pix.entradas);
+      els.metricEntradaEspecie.textContent = formatBRL(especieData.entradas);
+
+      els.metricSaldo.className = 'metric ' + (saldo >= 0 ? 'positive' : 'negative');
+      els.metricEspecie.className = 'metric ' + (especie >= 0 ? 'positive' : 'negative');
+
+      [['metricFormaDebito', debito.liquido], ['metricFormaCredito', credito.liquido], ['metricFormaPix', pix.liquido], ['metricFormaEspecie', especieData.liquido]]
+        .forEach(([key, value]) => {
+          els[key].className = 'mini-metric ' + (value >= 0 ? 'positive' : 'negative');
+        });
+
+      els.resultsInfo.textContent = rows.length + ' registro(s) • ' + getReportFilterText();
+      syncExportButtons();
+    }
+
+    function renderTable(rows) {
+      if (!rows.length) {
+        els.tableBody.innerHTML = '<tr><td colspan="10" class="empty">Nenhum lançamento encontrado.</td></tr>';
+        els.resultsInfo.textContent = '0 registro(s) • ' + getReportFilterText();
+        syncExportButtons();
+        return;
+      }
+
+      els.tableBody.innerHTML = rows.map(row => `
+        <tr>
+          <td>${formatDate(row.data_movimento)}</td>
+          <td>${formatTime(row.hora_movimento)}</td>
+          <td><span class="tag ${row.tipo === 'Entrada' ? 'in' : 'out'}">${escapeHtml(row.tipo)}</span></td>
+          <td>${escapeHtml(row.forma_pagamento || '')}</td>
+          <td>${escapeHtml(row.categoria || '')}</td>
+          <td>${escapeHtml(row.unidade || '')}</td>
+          <td>${escapeHtml(row.responsavel || '-')}</td>
+          <td>
+            <div><strong>${escapeHtml(row.descricao || '-')}</strong></div>
+            ${row.observacao ? `<div class="small">${escapeHtml(row.observacao)}</div>` : ''}
+          </td>
+          <td>${formatBRL(row.valor)}</td>
+          <td>
+            <div class="row-actions">
+              <button class="btn-secondary" type="button" onclick="startEdit('${row.id}')" ${hasAdminAccess() ? '' : 'disabled title="Desbloqueia com login e senha"'}>Editar${hasAdminAccess() ? '' : ' 🔒'}</button>
+              <button class="btn-danger" type="button" onclick="removeRow('${row.id}')" ${hasAdminAccess() ? '' : 'disabled title="Desbloqueia com login e senha"'}>Excluir${hasAdminAccess() ? '' : ' 🔒'}</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+      syncExportButtons();
+    }
+
+    function formatDate(value) {
+      if (!value) return '-';
+      const [y, m, d] = String(value).split('-');
+      if (!y || !m || !d) return escapeHtml(value);
+      return `${d}/${m}/${y}`;
+    }
+
+    function formatTime(value) {
+      if (!value) return '-';
+      return String(value).slice(0, 5);
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function getPayloadFromForm() {
+      const restrictedUnit = getAccessUnit();
+      return {
+        data_movimento: els.data_movimento.value,
+        hora_movimento: els.hora_movimento.value,
+        tipo: els.tipo.value,
+        forma_pagamento: els.forma_pagamento.value,
+        valor: parseCurrencyToNumber(els.valor.value),
+        categoria: els.categoria.value.trim(),
+        unidade: restrictedUnit || els.unidade.value.trim(),
+        responsavel: els.responsavel.value.trim(),
+        descricao: els.descricao.value.trim(),
+        observacao: els.observacao.value.trim()
+      };
+    }
+
+    function validatePayload(payload) {
+      if (!payload.data_movimento) return 'Data obrigatória.';
+      if (!isValidDateInput(payload.data_movimento)) return 'Data inválida.';
+      if (!payload.hora_movimento) return 'Hora obrigatória.';
+      if (!isValidTimeInput(payload.hora_movimento)) return 'Hora inválida.';
+      if (!payload.tipo) return 'Tipo obrigatório.';
+      if (!MOVEMENT_TYPES.includes(payload.tipo)) return 'Tipo inválido.';
+      if (!payload.forma_pagamento) return 'Forma obrigatória.';
+      if (!PAYMENT_METHODS.includes(payload.forma_pagamento)) return 'Forma de pagamento inválida.';
+      if (!payload.categoria) return 'Categoria obrigatória.';
+      if (!payload.unidade) return 'Unidade obrigatória.';
+      if (!canAccessUnit(payload.unidade)) return 'Esse login não tem permissão para lançar nessa unidade.';
+      if (!payload.responsavel) return 'Responsável obrigatório.';
+      if (!payload.valor || toFiniteNumber(payload.valor) <= 0) return 'Valor inválido.';
+      return null;
+    }
+
+    async function createRow(payload) {
+      const url = buildUrl('/rest/v1/' + TABLE_NAME);
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: buildHeaders(),
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || 'Erro ao salvar lançamento');
+      }
+      return res.json();
+    }
+
+    async function updateRow(id, payload) {
+      const url = buildUrl('/rest/v1/' + TABLE_NAME, { id: 'eq.' + id });
+      const res = await fetch(url, {
+        method: 'PATCH',
+        headers: buildHeaders(),
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || 'Erro ao atualizar lançamento');
+      }
+      return res.json();
+    }
+
+    async function deleteRow(id) {
+      const url = buildUrl('/rest/v1/' + TABLE_NAME, { id: 'eq.' + id });
+      const res = await fetch(url, {
+        method: 'DELETE',
+        headers: buildHeaders()
+      });
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(txt || 'Erro ao excluir lançamento');
+      }
+      return true;
+    }
+
+    async function handleSubmit(event) {
+      event.preventDefault();
+      if (!hasSystemAccess()) {
+        alert('Faz login no sistema para salvar lançamentos.');
+        return;
+      }
+      if (isSavingMovement) return;
+      try {
+        isSavingMovement = true;
+        els.submitBtn.disabled = true;
+        els.submitBtn.textContent = editingId ? 'Salvando alteração...' : 'Salvando lançamento...';
+        const payload = getPayloadFromForm();
+        const errorMessage = validatePayload(payload);
+        if (errorMessage) {
+          alert(errorMessage);
+          return;
+        }
+
+        if (editingId) {
+          if (!hasAdminAccess()) {
+            alert('Somente o administrador pode editar lançamentos.');
+            return;
+          }
+          await updateRow(editingId, payload);
+          alert('Lançamento atualizado.');
+        } else {
+          await createRow(payload);
+          alert('Lançamento salvo.');
+        }
+
+        resetForm();
+        await loadData();
+      } catch (error) {
+        console.error(error);
+        alert('Erro ao salvar.\n\n' + (error.message || error));
+      } finally {
+        isSavingMovement = false;
+        updateAdminUI();
+      }
+    }
+
+    function resetForm() {
+      editingId = null;
+      els.formTitle.textContent = 'Novo lançamento';
+      els.submitBtn.textContent = hasSystemAccess() ? 'Salvar lançamento' : 'Faça login para lançar';
+      els.cancelEditBtn.style.display = 'none';
+      els.cashForm.reset();
+      els.data_movimento.value = getLocalDateInputValue();
+      els.hora_movimento.value = getLocalTimeInputValue();
+      els.tipo.value = 'Entrada';
+      els.forma_pagamento.value = 'Débito';
+      els.unidade.value = getDefaultAllowedUnit();
+      els.responsavel.value = getDefaultResponsible();
+      applyUnitLockToFields();
+    }
+
+    window.startEdit = function(id) {
+      if (!hasAdminAccess()) {
+        alert('Edição bloqueada. Desbloqueia com login e senha.');
+        return;
+      }
+      const row = currentRows.find(item => item.id === id);
+      if (!row) return;
+      editingId = id;
+      els.formTitle.textContent = 'Editando lançamento';
+      els.submitBtn.textContent = 'Salvar alteração';
+      els.cancelEditBtn.style.display = 'inline-block';
+
+      els.data_movimento.value = row.data_movimento || getLocalDateInputValue();
+      els.hora_movimento.value = row.hora_movimento ? String(row.hora_movimento).slice(0, 5) : getLocalTimeInputValue();
+      els.tipo.value = row.tipo || 'Entrada';
+      els.forma_pagamento.value = row.forma_pagamento || 'Débito';
+      els.valor.value = formatBRL(row.valor || 0);
+      els.categoria.value = row.categoria || '';
+      els.unidade.value = row.unidade || 'UR-3';
+      els.responsavel.value = row.responsavel || '';
+      els.descricao.value = row.descricao || '';
+      els.observacao.value = row.observacao || '';
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    window.removeRow = async function(id) {
+      if (!hasAdminAccess()) {
+        alert('Exclusão bloqueada. Desbloqueia com login e senha.');
+        return;
+      }
+      const confirmDelete = confirm('Tem certeza que deseja excluir esse lançamento?');
+      if (!confirmDelete) return;
+
+      try {
+        await deleteRow(id);
+        alert('Lançamento excluído.');
+        await loadData();
+      } catch (error) {
+        console.error(error);
+        alert('Erro ao excluir.\n\n' + (error.message || error));
+      }
+    }
+
+    function getReportTotals(rows) {
+      const entradas = rows
+        .filter(row => row.tipo === 'Entrada')
+        .reduce((sum, row) => sum + toFiniteNumber(row.valor), 0);
+
+      const saidas = rows
+        .filter(row => row.tipo === 'Saída')
+        .reduce((sum, row) => sum + toFiniteNumber(row.valor), 0);
+
+      const totalByForma = forma => {
+        const entradasForma = rows
+          .filter(row => row.tipo === 'Entrada' && row.forma_pagamento === forma)
+          .reduce((sum, row) => sum + toFiniteNumber(row.valor), 0);
+
+        const saidasForma = rows
+          .filter(row => row.tipo === 'Saída' && row.forma_pagamento === forma)
+          .reduce((sum, row) => sum + toFiniteNumber(row.valor), 0);
+
+        return {
+          entradas: entradasForma,
+          saidas: saidasForma,
+          liquido: entradasForma - saidasForma
+        };
+      };
+
+      const especieData = totalByForma('Espécie');
+
+      return {
+        entradas,
+        saidas,
+        saldo: entradas - saidas,
+        especie: especieData.liquido,
+        debito: totalByForma('Débito'),
+        credito: totalByForma('Crédito'),
+        pix: totalByForma('Pix'),
+        especieData
+      };
+    }
+
+    function getReportFilterText() {
+      const filters = getFilters();
+      const parts = [];
+      if (filters.dataInicio || filters.dataFim) {
+        const inicio = filters.dataInicio ? formatDate(filters.dataInicio) : 'início';
+        const fim = filters.dataFim ? formatDate(filters.dataFim) : 'hoje';
+        parts.push(`Período: ${inicio} até ${fim}`);
+      }
+      if (filters.tipo) parts.push(`Tipo: ${filters.tipo}`);
+      if (filters.forma) parts.push(`Forma: ${filters.forma}`);
+      if (filters.unidade) parts.push(`Unidade: ${filters.unidade}`);
+      if (filters.busca) parts.push(`Busca: ${els.filterBusca.value.trim()}`);
+      return parts.length ? parts.join(' • ') : 'Sem filtros aplicados';
+    }
+
+    function printReport() {
+      if (!currentRows.length) {
+        alert('Não há dados para imprimir.');
+        return;
+      }
+
+      const totals = getReportTotals(currentRows);
+      const generatedAt = new Date().toLocaleString('pt-BR');
+      const filterText = getReportFilterText();
+      const logoSrc = document.querySelector('.brand-badge img')?.src || '';
+      const rowsHtml = currentRows.map(row => `
+        <tr>
+          <td>${escapeHtml(formatDate(row.data_movimento))}</td>
+          <td>${escapeHtml(formatTime(row.hora_movimento))}</td>
+          <td>${escapeHtml(row.tipo || '')}</td>
+          <td>${escapeHtml(row.forma_pagamento || '')}</td>
+          <td>${escapeHtml(row.categoria || '')}</td>
+          <td>${escapeHtml(row.unidade || '')}</td>
+          <td>${escapeHtml(row.responsavel || '')}</td>
+          <td>${escapeHtml(row.descricao || '')}${row.observacao ? `<br><small>${escapeHtml(row.observacao)}</small>` : ''}</td>
+          <td class="money">${escapeHtml(formatBRL(row.valor))}</td>
+        </tr>
+      `).join('');
+
+      const reportHtml = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Relatório de Caixa - Superação</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px; font-family: Arial, Helvetica, sans-serif; color: #0f172a; background: #ffffff; }
+    .report-header { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; border-bottom: 3px solid #16a34a; padding-bottom: 14px; margin-bottom: 18px; }
+    .brand { display: flex; gap: 12px; align-items: center; }
+    .brand img { width: 58px; height: 58px; object-fit: contain; border: 1px solid #bbf7d0; border-radius: 14px; padding: 5px; }
+    h1 { margin: 0; color: #14532d; font-size: 24px; }
+    .subtitle { margin: 4px 0 0; color: #475569; font-size: 12px; }
+    .meta { text-align: right; color: #475569; font-size: 12px; line-height: 1.45; }
+    .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 16px 0; }
+    .card-print { border: 1px solid #bbf7d0; border-radius: 12px; padding: 10px; background: #f0fdf4; }
+    .card-print .label { color: #166534; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+    .card-print .value { margin-top: 6px; font-size: 18px; font-weight: 800; color: #052e16; }
+    .section-title { margin: 18px 0 8px; color: #14532d; font-size: 16px; }
+    table { width: 100%; border-collapse: collapse; page-break-inside: auto; }
+    th, td { border: 1px solid #cbd5e1; padding: 7px; font-size: 11px; text-align: left; vertical-align: top; }
+    th { background: #dcfce7; color: #14532d; font-size: 11px; }
+    tr:nth-child(even) td { background: #f8fafc; }
+    .money { text-align: right; white-space: nowrap; font-weight: 700; }
+    .payments { max-width: 560px; margin-bottom: 12px; }
+    small { color: #64748b; }
+    .footer { margin-top: 18px; padding-top: 10px; border-top: 1px solid #cbd5e1; color: #64748b; font-size: 11px; display: flex; justify-content: space-between; gap: 10px; }
+    @media print {
+      body { padding: 12mm; }
+      .no-print { display: none !important; }
+      .summary { grid-template-columns: repeat(4, 1fr); }
+      table { page-break-inside: auto; }
+      tr { page-break-inside: avoid; page-break-after: auto; }
+      thead { display: table-header-group; }
+      * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    }
+    @media (max-width: 800px) {
+      .summary { grid-template-columns: 1fr 1fr; }
+      .report-header { flex-direction: column; }
+      .meta { text-align: left; }
+    }
+  </style>
+</head>
+<body>
+  <div class="report-header">
+    <div class="brand">
+      ${logoSrc ? `<img src="${logoSrc}" alt="Logo Academia Superação">` : ''}
+      <div>
+        <h1>Relatório de Caixa</h1>
+        <p class="subtitle">Academia Superação</p>
+      </div>
+    </div>
+    <div class="meta">
+      <strong>Gerado em:</strong> ${escapeHtml(generatedAt)}<br>
+      <strong>Filtros:</strong> ${escapeHtml(filterText)}<br>
+      <strong>Registros:</strong> ${currentRows.length}
+    </div>
+  </div>
+
+  <div class="summary">
+    <div class="card-print"><div class="label">Entradas</div><div class="value">${escapeHtml(formatBRL(totals.entradas))}</div></div>
+    <div class="card-print"><div class="label">Saídas</div><div class="value">${escapeHtml(formatBRL(totals.saidas))}</div></div>
+    <div class="card-print"><div class="label">Saldo líquido</div><div class="value">${escapeHtml(formatBRL(totals.saldo))}</div></div>
+    <div class="card-print"><div class="label">Espécie líquido</div><div class="value">${escapeHtml(formatBRL(totals.especie))}</div></div>
+  </div>
+
+  <h2 class="section-title">Totais por forma de pagamento</h2>
+  <table class="payments">
+    <thead><tr><th>Forma</th><th>Entradas</th><th>Saídas</th><th>Líquido</th></tr></thead>
+    <tbody>
+      <tr><td>Débito</td><td class="money">${escapeHtml(formatBRL(totals.debito.entradas))}</td><td class="money">${escapeHtml(formatBRL(totals.debito.saidas))}</td><td class="money">${escapeHtml(formatBRL(totals.debito.liquido))}</td></tr>
+      <tr><td>Crédito</td><td class="money">${escapeHtml(formatBRL(totals.credito.entradas))}</td><td class="money">${escapeHtml(formatBRL(totals.credito.saidas))}</td><td class="money">${escapeHtml(formatBRL(totals.credito.liquido))}</td></tr>
+      <tr><td>Pix</td><td class="money">${escapeHtml(formatBRL(totals.pix.entradas))}</td><td class="money">${escapeHtml(formatBRL(totals.pix.saidas))}</td><td class="money">${escapeHtml(formatBRL(totals.pix.liquido))}</td></tr>
+      <tr><td>Espécie</td><td class="money">${escapeHtml(formatBRL(totals.especieData.entradas))}</td><td class="money">${escapeHtml(formatBRL(totals.especieData.saidas))}</td><td class="money">${escapeHtml(formatBRL(totals.especieData.liquido))}</td></tr>
+    </tbody>
+  </table>
+
+  <h2 class="section-title">Lançamentos</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Data</th>
+        <th>Hora</th>
+        <th>Tipo</th>
+        <th>Forma</th>
+        <th>Categoria</th>
+        <th>Unidade</th>
+        <th>Responsável</th>
+        <th>Descrição / Observação</th>
+        <th>Valor</th>
+      </tr>
+    </thead>
+    <tbody>${rowsHtml}</tbody>
+  </table>
+
+  <div class="footer">
+    <span>Relatório gerado pelo Caixa Superação.</span>
+    <span>Assinatura: ____________________________________</span>
+  </div>
+
+  <div class="no-print" style="margin-top:16px;">
+    <button onclick="window.print()" style="padding:10px 14px;border:0;border-radius:8px;background:#16a34a;color:white;font-weight:700;cursor:pointer;">Imprimir agora</button>
+    <button onclick="window.close()" style="padding:10px 14px;border:1px solid #cbd5e1;border-radius:8px;background:white;color:#0f172a;font-weight:700;cursor:pointer;margin-left:8px;">Fechar</button>
+  </div>
+</body>
+</html>`;
+
+      const printWindow = window.open('', '_blank', 'width=1200,height=800');
+      if (!printWindow) {
+        alert('O navegador bloqueou a janela de impressão. Libera pop-ups para esse arquivo e tenta novamente.');
+        return;
+      }
+      printWindow.document.open();
+      printWindow.document.write(reportHtml);
+      printWindow.document.close();
+      printWindow.focus();
+      setTimeout(() => printWindow.print(), 500);
+    }
+
+    function exportToExcel() {
+      if (!currentRows.length) {
+        alert('Não há dados para exportar.');
+        return;
+      }
+
+      const title = 'Caixa Superação';
+      const generatedAt = new Date().toLocaleString('pt-BR');
+      const rowsHtml = currentRows.map(row => `
+        <tr>
+          <td>${escapeHtml(formatDate(row.data_movimento))}</td>
+          <td>${escapeHtml(formatTime(row.hora_movimento))}</td>
+          <td>${escapeHtml(row.tipo || '')}</td>
+          <td>${escapeHtml(row.forma_pagamento || '')}</td>
+          <td>${escapeHtml(row.categoria || '')}</td>
+          <td>${escapeHtml(row.unidade || '')}</td>
+          <td>${escapeHtml(row.responsavel || '')}</td>
+          <td>${escapeHtml(row.descricao || '')}</td>
+          <td>${escapeHtml(row.observacao || '')}</td>
+          <td>${escapeHtml(formatBRL(row.valor))}</td>
+        </tr>
+      `).join('');
+
+      const html = `<!DOCTYPE html>
+      <html xmlns:o="urn:schemas-microsoft-com:office:office"
+            xmlns:x="urn:schemas-microsoft-com:office:excel"
+            xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+        <meta charset="UTF-8">
+        <style>
+          body { font-family: Arial, sans-serif; padding: 20px; }
+          h1 { color: #15803d; margin: 0 0 6px; }
+          .meta { color: #475569; margin: 0 0 16px; }
+          table { border-collapse: collapse; width: 100%; }
+          th, td { border: 1px solid #cbd5e1; padding: 8px; font-size: 12px; }
+          th { background: #dcfce7; color: #14532d; text-align: left; }
+          tr:nth-child(even) td { background: #f8fafc; }
+        </style>
+      </head>
+      <body>
+        <h1>${title}</h1>
+        <p class="meta">Exportado em ${generatedAt}</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Hora</th>
+              <th>Tipo</th>
+              <th>Forma</th>
+              <th>Categoria</th>
+              <th>Unidade</th>
+              <th>Responsável</th>
+              <th>Descrição</th>
+              <th>Observação</th>
+              <th>Valor</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </body>
+      </html>`;
+
+      const blob = new Blob(['﻿' + html], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const dateStr = getLocalDateInputValue();
+      a.href = url;
+      a.download = `caixa_superacao_${dateStr}.xls`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportToCsv() {
+      if (!currentRows.length) {
+        alert('Não há dados para exportar.');
+        return;
+      }
+
+      const headers = ['Data','Hora','Tipo','Forma','Categoria','Unidade','Responsável','Descrição','Observação','Valor'];
+      const lines = currentRows.map(row => [
+        formatDate(row.data_movimento),
+        formatTime(row.hora_movimento),
+        row.tipo || '',
+        row.forma_pagamento || '',
+        row.categoria || '',
+        row.unidade || '',
+        row.responsavel || '',
+        row.descricao || '',
+        row.observacao || '',
+        toFiniteNumber(row.valor).toFixed(2).replace('.', ',')
+      ]);
+
+      const csv = [headers, ...lines]
+        .map(line => line.map(value => `"${String(value).replaceAll('"', '""')}"`).join(';'))
+        .join('\n');
+
+      const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const dateStr = getLocalDateInputValue();
+      a.href = url;
+      a.download = `caixa_superacao_${dateStr}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function resetFilters() {
+      els.filterDataInicio.value = '';
+      els.filterDataFim.value = '';
+      els.filterTipo.value = '';
+      els.filterForma.value = '';
+      els.filterUnidade.value = getAllowedUnits().length === 1 ? getAllowedUnits()[0] : '';
+      els.filterBusca.value = '';
+      applyUnitLockToFields();
+      loadData();
+    }
+
+    function filterToday() {
+      const today = getLocalDateInputValue();
+      els.filterDataInicio.value = today;
+      els.filterDataFim.value = today;
+      loadData();
+    }
+
+    els.unlockAdminBtn.addEventListener('click', unlockAdmin);
+    els.lockAdminBtn.addEventListener('click', lockAdmin);
+    els.testConnectionBtn.addEventListener('click', testConnection);
+    els.valor.addEventListener('blur', formatCurrencyInput);
+    els.valor.addEventListener('focus', prepareCurrencyInputForTyping);
+    els.cashForm.addEventListener('submit', handleSubmit);
+    els.cancelEditBtn.addEventListener('click', resetForm);
+    els.printReportBtn.addEventListener('click', printReport);
+    els.exportExcelBtn.addEventListener('click', exportToExcel);
+    els.exportCsvBtn.addEventListener('click', exportToCsv);
+    els.refreshBtn.addEventListener('click', loadData);
+    els.applyFiltersBtn.addEventListener('click', loadData);
+    els.todayFilterBtn.addEventListener('click', filterToday);
+    els.resetFiltersBtn.addEventListener('click', resetFilters);
+    els.filterBusca.addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        loadData();
+      }
+    });
+    els.userForm.addEventListener('submit', saveUser);
+    els.cancelUserEditBtn.addEventListener('click', resetUserForm);
+    els.refreshUsersBtn.addEventListener('click', loadUsers);
+
+    updateAdminUI();
+    syncExportButtons();
+    if (getConfig()) {
+      setStatus('CONFIG carregada do código', 'ok');
+    }
+    loadData();
+    if (hasAdminAccess()) loadUsers();
+  </script>
+</body>
+</html>
