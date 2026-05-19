@@ -71,7 +71,8 @@ Ferramenta para registrar, acompanhar e organizar solicitações de cancelamento
 
 ### Folha de Pagamento
 
-![Folha de Pagamento](<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/d59a60bf-9251-40a5-a67c-6fa1dc03fcfc" />
+![Folha de Pagamento](<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/d59a60bf-9251-40a5-a67c-6fa1dc03fcfc" 
+/>
 )
 
 ### Sistema de Caixa
@@ -83,10 +84,9 @@ Ferramenta para registrar, acompanhar e organizar solicitações de cancelamento
 
 ### Cancelamentos
 
-![Sistema de Cancelamento](<img width="1021" height="1062" alt="image" src="https://github.com/user-attachments/assets/f302d6ff-77ef-43f9-bff2-7091256528fc" />
+![Sistema de Cancelamento](<img width="1021" height="1062" alt="image" src="https://github.com/user-attachments/assets/f302d6ff-77ef-43f9-bff2-7091256528fc" 
+/>
 )
-
-> Caso as imagens não apareçam, verifique se o nome dos arquivos dentro da pasta `logar no GitHub` está igual ao usado no README.
 
 ---
 
