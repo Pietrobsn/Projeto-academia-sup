@@ -71,15 +71,20 @@ Ferramenta para registrar, acompanhar e organizar solicitações de cancelamento
 
 ### Folha de Pagamento
 
-![Folha de Pagamento](./logar%20no%20GitHub/folha.png)
+![Folha de Pagamento](<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/d59a60bf-9251-40a5-a67c-6fa1dc03fcfc" />
+)
 
 ### Sistema de Caixa
 
-![Sistema de Caixa](./logar%20no%20GitHub/caixa.png)
+![Sistema de Caixa](<img width="1339" height="1064" alt="image" src="https://github.com/user-attachments/assets/0b6b6d65-7641-45eb-bf3e-bdf540198941" />
+<img width="1355" height="1077" alt="image" src="https://github.com/user-attachments/assets/64d06c3c-47b7-4a06-bd87-dd8603bb4e7b" />
+)
+)
 
 ### Cancelamentos
 
-![Sistema de Cancelamento](./logar%20no%20GitHub/cancelamento.png)
+![Sistema de Cancelamento](<img width="1021" height="1062" alt="image" src="https://github.com/user-attachments/assets/f302d6ff-77ef-43f9-bff2-7091256528fc" />
+)
 
 > Caso as imagens não apareçam, verifique se o nome dos arquivos dentro da pasta `logar no GitHub` está igual ao usado no README.
 
@@ -115,10 +120,3 @@ A proposta é transformar processos que normalmente são feitos em planilhas ou 
 - Mais agilidade na rotina administrativa
 
 ---
-
-## 🚀 Como Usar
-
-1. Baixe ou clone este repositório:
-
-```bash
-git clone https://github.com/SEU-USUARIO/NOME-DO-REPOSITORIO.git
